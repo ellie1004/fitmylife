@@ -1,0 +1,30 @@
+{
+  "name": "fitmylife",
+  "version": "1.0.0",
+  "description": "AI 맞춤 운동처방 + YouTube 큐레이션 앱",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "axios": "^1.13.6",
+    "expo": "^55.0.8",
+    "expo-status-bar": "^55.0.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-native": "^0.84.1",
+    "react-native-safe-area-context": "^5.7.0",
+    "react-native-screens": "^4.24.0",
+    "react-native-webview": "^13.16.1",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-native": "^0.72.8",
+    "expo-router": "^55.0.7",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "FitMyLife",
+    "slug": "fitmylife",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "fitmylife",
+    "splash": {
+      "backgroundColor": "#2E75B6"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fitmylife.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#2E75B6"
+      },
+      "package": "com.fitmylife.app"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}
