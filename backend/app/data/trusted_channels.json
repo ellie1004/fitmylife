@@ -1,0 +1,144 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-03-25",
+  "description": "FitMyLife 신뢰 운동 YouTube 채널 목록. AI 큐레이션 시 이 채널의 영상을 우선 추천합니다.",
+  "channels": [
+    {
+      "name": "땅끄부부",
+      "channel_id": "UCLMkTIcmLMGaxSoSaomJ0Ew",
+      "tags": ["홈트", "유산소", "근력", "전연령", "초보자", "다이어트"],
+      "trust_score": 95,
+      "language": "ko",
+      "difficulty": ["beginner", "intermediate"],
+      "exercise_types": ["cardio", "strength", "flexibility"],
+      "description": "부부 트레이너의 홈트레이닝 채널. 부위별 운동, 짧은 시간 고효율"
+    },
+    {
+      "name": "심으뜸",
+      "channel_id": "UCDkMi5dGMJ4vmzPuvgQWbug",
+      "tags": ["근력", "스트레칭", "여성", "초보자", "헬스장", "챌린지"],
+      "trust_score": 93,
+      "language": "ko",
+      "difficulty": ["beginner", "intermediate"],
+      "exercise_types": ["strength", "flexibility", "cardio"],
+      "description": "차분하고 자세한 설명. 초보자 친화적. 헬스장 기구 사용법도 제공"
+    },
+    {
+      "name": "강하나",
+      "channel_id": "UCbFz7BmuwWPHAifA1SfdOeA",
+      "tags": ["스트레칭", "유연성", "시니어", "재활", "여성"],
+      "trust_score": 90,
+      "language": "ko",
+      "difficulty": ["beginner"],
+      "exercise_types": ["flexibility", "balance"],
+      "description": "부드러운 스트레칭 전문. 시니어·재활 대상자에게 적합"
+    },
+    {
+      "name": "소미핏",
+      "channel_id": "UCgMjLjDFMpFm_GHWO3Ymy2A",
+      "tags": ["하체", "힙", "체형교정", "여성", "홈트"],
+      "trust_score": 92,
+      "language": "ko",
+      "difficulty": ["beginner", "intermediate"],
+      "exercise_types": ["strength", "flexibility"],
+      "description": "하체·힙 전문 홈트. 체형 교정 스트레칭 인기"
+    },
+    {
+      "name": "피톨로지",
+      "channel_id": "UC-i4jkCJsG6_2QFDh05jYjw",
+      "tags": ["이론", "영양", "운동생리학", "중급", "다이어트"],
+      "trust_score": 88,
+      "language": "ko",
+      "difficulty": ["intermediate", "advanced"],
+      "exercise_types": ["strength", "cardio"],
+      "description": "영양학+운동생리학 전문 지식 채널. 이론적 근거 기반"
+    },
+    {
+      "name": "GYM종국",
+      "channel_id": "UCWxii6kOoEB-OR0e6E4SZLA",
+      "tags": ["근력", "남성", "다이어트", "영양", "동기부여"],
+      "trust_score": 85,
+      "language": "ko",
+      "difficulty": ["intermediate", "advanced"],
+      "exercise_types": ["strength"],
+      "description": "김종국의 운동 노하우·영양 섭취 채널"
+    },
+    {
+      "name": "다노TV",
+      "channel_id": "UC4SmnGhQLEIHRBHVHN0k7_A",
+      "tags": ["다이어트", "습관", "여성", "홈트", "마인드"],
+      "trust_score": 88,
+      "language": "ko",
+      "difficulty": ["beginner", "intermediate"],
+      "exercise_types": ["cardio", "strength", "flexibility"],
+      "description": "다이어트 코칭 업체 다노 운영. 습관 성형 모토. 여성 대상 콘텐츠 풍부"
+    },
+    {
+      "name": "이지은 다이어트",
+      "channel_id": "UCX7FXZB0EMERlwfFZIevMOA",
+      "tags": ["하체", "다이어트", "홈트", "여성", "슬림"],
+      "trust_score": 87,
+      "language": "ko",
+      "difficulty": ["beginner", "intermediate"],
+      "exercise_types": ["cardio", "strength"],
+      "description": "허벅지·하체 집중 다이어트 루틴"
+    },
+    {
+      "name": "Fitness Blender",
+      "channel_id": "UCVGc2nGbRzYMnvNaEuMigMw",
+      "tags": ["전신", "인터벌", "홈트", "전연령", "칼로리표시"],
+      "trust_score": 95,
+      "language": "en",
+      "difficulty": ["beginner", "intermediate", "advanced"],
+      "exercise_types": ["cardio", "strength", "flexibility", "hiit"],
+      "description": "500+ 영상. 운동 시간·칼로리 소모량 표시. 난이도별 분류"
+    },
+    {
+      "name": "Blogilates",
+      "channel_id": "UCIJwWYOfsCfz6PjxbONYXSg",
+      "tags": ["필라테스", "코어", "여성", "입문자", "해외"],
+      "trust_score": 90,
+      "language": "en",
+      "difficulty": ["beginner", "intermediate"],
+      "exercise_types": ["flexibility", "strength", "cardio"],
+      "description": "Cassey Ho의 팝 필라테스. 유쾌한 진행. 입문자 영상 별도 제공"
+    },
+    {
+      "name": "Yuuka Sagawa",
+      "channel_id": "UCyTBnrdJOLJT7SXMT8JUywA",
+      "tags": ["상체", "초보자", "맨몸", "짧은영상", "한국어자막"],
+      "trust_score": 91,
+      "language": "ja",
+      "difficulty": ["beginner"],
+      "exercise_types": ["strength", "flexibility"],
+      "description": "8분 루틴 전문. 한국어 자막 제공. 차분한 내레이션"
+    },
+    {
+      "name": "바벨라토르 홈트레이닝",
+      "channel_id": "UCXbLMnQirEHMtrUEkAaH3Dw",
+      "tags": ["맨몸", "남성", "철봉", "재활", "단계별"],
+      "trust_score": 86,
+      "language": "ko",
+      "difficulty": ["beginner", "intermediate", "advanced"],
+      "exercise_types": ["strength", "flexibility"],
+      "description": "단계별 맨몸 운동·철봉 전문. 재활 경험 기반 콘텐츠"
+    }
+  ],
+  "exercise_type_mapping": {
+    "cardio": ["유산소", "달리기", "걷기", "줄넘기", "에어로빅", "줌바", "인터벌"],
+    "strength": ["근력", "웨이트", "푸쉬업", "스쿼트", "플랭크", "코어", "덤벨"],
+    "flexibility": ["스트레칭", "유연성", "요가", "필라테스", "관절"],
+    "balance": ["밸런스", "균형", "코어안정화"],
+    "hiit": ["HIIT", "타바타", "고강도인터벌", "버피"]
+  },
+  "intensity_mapping": {
+    "low": ["초보자", "입문", "쉬운", "가벼운", "시니어"],
+    "moderate": ["중급", "보통", "일반"],
+    "high": ["고강도", "상급", "하드코어", "챌린지"]
+  },
+  "duration_mapping": {
+    "short": {"label": "짧은 운동", "range": [1, 10], "youtube_filter": "short"},
+    "medium": {"label": "보통 운동", "range": [10, 30], "youtube_filter": "medium"},
+    "long": {"label": "긴 운동", "range": [30, 60], "youtube_filter": "long"}
+  }
+}
