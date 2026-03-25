@@ -45,6 +45,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
   const [step, setStep] = useState<Step>("profile");
 
   // 프로필 입력
+  const [nickname, setNickname] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "other" | null>(null);
 
@@ -86,8 +87,8 @@ export default function OnboardingScreen({ onComplete }: Props) {
 
   // 프로필 완료 → 체크리스트 시작
   const handleProfileDone = () => {
-    if (!age || !gender) return;
-    setProfile({ age: parseInt(age), gender });
+    if (!nickname.trim() || !age || !gender) return;
+    setProfile({ age: parseInt(age), gender, nickname: nickname.trim() });
     setStep("checklist");
   };
 
@@ -155,7 +156,17 @@ export default function OnboardingScreen({ onComplete }: Props) {
           </Text>
 
           <View style={styles.profileCard}>
-            <Text style={styles.inputLabel}>나이</Text>
+            <Text style={styles.inputLabel}>닉네임</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="예: 엘리"
+              placeholderTextColor="#9CA3AF"
+              value={nickname}
+              onChangeText={setNickname}
+              maxLength={10}
+            />
+
+            <Text style={[styles.inputLabel, { marginTop: 20 }]}>나이</Text>
             <TextInput
               style={styles.input}
               placeholder="예: 28"
@@ -200,7 +211,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
           <TouchableOpacity
             style={[
               styles.ctaButton,
-              (!age || !gender) && styles.ctaDisabled,
+              (!nickname.trim() || !age || !gender) && styles.ctaDisabled,
             ]}
             onPress={handleProfileDone}
             disabled={!age || !gender}

@@ -60,7 +60,7 @@ export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
       {/* 상단 헤더 */}
       <View style={styles.header}>
         <Text style={styles.greeting}>
-          안녕하세요{profile?.age ? ` ${profile.age}세` : ""} 회원님 👋
+          안녕하세요, {profile?.nickname || "회원"}님 👋
         </Text>
         <Text style={styles.appName}>FitMyLife</Text>
       </View>
