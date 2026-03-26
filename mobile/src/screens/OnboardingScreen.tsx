@@ -79,7 +79,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
   // 프로필 입력
   const [nickname, setNickname] = useState("");
   const [age, setAge] = useState("");
-  const [gender, setGender] = useState<"male" | "female" | "other" | null>(null);
+  const [gender, setGender] = useState<"male" | "female" | null>(null);
 
   // 체크리스트
   const [questions, setQuestions] = useState<ChecklistQuestion[]>([]);
@@ -237,9 +237,8 @@ export default function OnboardingScreen({ onComplete }: Props) {
             <View style={styles.genderRow}>
               {(
                 [
-                  { key: "male", label: "남성", emoji: "🙋‍♂️" },
-                  { key: "female", label: "여성", emoji: "🙋‍♀️" },
-                  { key: "other", label: "기타", emoji: "🧑" },
+                  { key: "male", label: "남성", emoji: "🙋🏻‍♂️" },
+                  { key: "female", label: "여성", emoji: "🙋🏻‍♀️" },
                 ] as const
               ).map((g) => (
                 <TouchableOpacity

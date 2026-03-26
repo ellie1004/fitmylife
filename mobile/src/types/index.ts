@@ -19,7 +19,7 @@ export interface ChecklistAnswer {
 export interface ChecklistSubmission {
   answers: ChecklistAnswer[];
   user_age: number;
-  user_gender: "male" | "female" | "other";
+  user_gender: "male" | "female";
   user_height?: number;
   user_weight?: number;
 }
@@ -75,7 +75,7 @@ export interface ApiResponse<T> {
 
 export interface UserProfile {
   age: number;
-  gender: "male" | "female" | "other";
+  gender: "male" | "female";
   height?: number;
   weight?: number;
   nickname?: string;
