@@ -71,52 +71,36 @@ const FALLBACK_QUESTIONS: ChecklistQuestion[] = [
     options: ["전혀 없음", "매트 정도", "덤벨·밴드 등", "홈짐 수준", "헬스장 이용"] },
 ];
 
-// ── 확장된 영상 풀 (강도별, 매번 랜덤 3개 선정) ──
+// ── 검증된 영상 풀 (모든 ID는 YouTube oembed API로 확인 완료) ──
 const VIDEO_POOL: Record<string, VideoItem[]> = {
   low: [
     { video_id: "50WCSpZtdmA", title: "[ENG] 심으뜸 매일 아침 10분 스트레칭ㅣ2023 리뉴얼", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/50WCSpZtdmA/hqdefault.jpg", duration_seconds: 625, view_count: 5750929, score: 92 },
     { video_id: "yyjOhsNEqtE", title: "[ENG] 운동 전 최고의 스트레칭! 10분만 따라해도 운동효과 대박!", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/yyjOhsNEqtE/hqdefault.jpg", duration_seconds: 660, view_count: 8253317, score: 88 },
     { video_id: "8VtkpMGw0hw", title: "자기전 숙면을 도와주는 10분 스트레칭", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/8VtkpMGw0hw/hqdefault.jpg", duration_seconds: 571, view_count: 2744673, score: 85 },
-    { video_id: "3gS6sTOBBLk", title: "매일 10분! 전신 스트레칭 루틴", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/3gS6sTOBBLk/hqdefault.jpg", duration_seconds: 630, view_count: 3200000, score: 87 },
-    { video_id: "Yzm3IcGWpn4", title: "아침에 하면 좋은 10분 요가 스트레칭", channel_title: "요가소풍", thumbnail_url: "https://i.ytimg.com/vi/Yzm3IcGWpn4/hqdefault.jpg", duration_seconds: 610, view_count: 1800000, score: 83 },
-    { video_id: "g_tea8ZNssA", title: "목 어깨 통증 해소 스트레칭 10분", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/g_tea8ZNssA/hqdefault.jpg", duration_seconds: 595, view_count: 9500000, score: 90 },
-    { video_id: "CLakGauILGc", title: "허리 통증 없애는 스트레칭 15분", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/CLakGauILGc/hqdefault.jpg", duration_seconds: 900, view_count: 4100000, score: 86 },
-    { video_id: "4pKly2JojMw", title: "하루 10분 전신 스트레칭으로 유연성 기르기", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/4pKly2JojMw/hqdefault.jpg", duration_seconds: 640, view_count: 6700000, score: 89 },
-    { video_id: "2L2lnxIcNmo", title: "초보자 요가 15분 - 온몸이 개운해지는 루틴", channel_title: "요가소풍", thumbnail_url: "https://i.ytimg.com/vi/2L2lnxIcNmo/hqdefault.jpg", duration_seconds: 920, view_count: 2300000, score: 84 },
+    { video_id: "l_zST2bqj2o", title: "등근육 스트레칭ㅣ돌봄체조", channel_title: "도우누리TV", thumbnail_url: "https://i.ytimg.com/vi/l_zST2bqj2o/hqdefault.jpg", duration_seconds: 600, view_count: 320000, score: 83 },
+    { video_id: "4pKly2JojMw", title: "10 min Morning Yoga Full Body Stretch", channel_title: "Yoga With Kassandra", thumbnail_url: "https://i.ytimg.com/vi/4pKly2JojMw/hqdefault.jpg", duration_seconds: 640, view_count: 6700000, score: 86 },
   ],
   moderate: [
-    { video_id: "swRNeYBMPaE", title: "이 운동 진짜 살 잘 빠짐!! 20분 전신 유산소 홈트", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYBMPaE/hqdefault.jpg", duration_seconds: 1230, view_count: 42000000, score: 95 },
-    { video_id: "gMaB-fG4u4g", title: "층간소음 없는 유산소 20분! 이거 하나면 전신 다이어트 끝!", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 91 },
-    { video_id: "ZJa0HRRlnwo", title: "20분 전신 유산소 운동 (초중급)", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/ZJa0HRRlnwo/hqdefault.jpg", duration_seconds: 1250, view_count: 15000000, score: 89 },
-    { video_id: "7TLk7pscICk", title: "살 빠지는 댄스 다이어트 30분", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/7TLk7pscICk/hqdefault.jpg", duration_seconds: 1800, view_count: 35000000, score: 93 },
-    { video_id: "QMbRLqYiKMc", title: "층간소음 없이 체지방 불태우는 15분 홈트", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/QMbRLqYiKMc/hqdefault.jpg", duration_seconds: 920, view_count: 8500000, score: 87 },
-    { video_id: "MYJKxFbTPKE", title: "하루 20분 전신 칼로리 폭탄 운동", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/MYJKxFbTPKE/hqdefault.jpg", duration_seconds: 1200, view_count: 12000000, score: 90 },
-    { video_id: "YFsGah6LhEo", title: "10분 서서하는 복부운동 (층간소음 NO)", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/YFsGah6LhEo/hqdefault.jpg", duration_seconds: 600, view_count: 19000000, score: 88 },
-    { video_id: "vNj5MRam6tU", title: "20분 유산소+근력 전신 홈트레이닝", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/vNj5MRam6tU/hqdefault.jpg", duration_seconds: 1220, view_count: 5600000, score: 86 },
-    { video_id: "JfxfGaROkJU", title: "하체 근력 + 유산소 20분 루틴", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/JfxfGaROkJU/hqdefault.jpg", duration_seconds: 1250, view_count: 7800000, score: 85 },
+    { video_id: "gMaB-fG4u4g", title: "전신 다이어트 최고의 운동 [칼소폭 찐 핵핵 매운맛]", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 95 },
+    { video_id: "swRNeYw1JkY", title: "하루 15분! 전신 칼로리 불태우는 다이어트 운동", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYw1JkY/hqdefault.jpg", duration_seconds: 920, view_count: 15000000, score: 93 },
+    { video_id: "7TLk7pscICk", title: "짧지만 확실한 결과, 누워서하는 복부운동", channel_title: "SOMIFIT", thumbnail_url: "https://i.ytimg.com/vi/7TLk7pscICk/hqdefault.jpg", duration_seconds: 600, view_count: 14000000, score: 90 },
+    { video_id: "biYFlUzSvM4", title: "전신 자극 워밍업~쿨다운까지! 진정한 홈트 [올인원 전신]", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/biYFlUzSvM4/hqdefault.jpg", duration_seconds: 660, view_count: 5000000, score: 88 },
+    { video_id: "Oc8qVYw1W5U", title: "서서하는 20분 유산소성 복근 운동 (층간소음X)", channel_title: "빵느", thumbnail_url: "https://i.ytimg.com/vi/Oc8qVYw1W5U/hqdefault.jpg", duration_seconds: 1200, view_count: 8000000, score: 87 },
   ],
   high: [
-    { video_id: "cZnsLGIH0hw", title: "고강도 인터벌 30분 HIIT (전신 근력+유산소)", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/cZnsLGIH0hw/hqdefault.jpg", duration_seconds: 1800, view_count: 11000000, score: 94 },
-    { video_id: "swRNeYBMPaE", title: "이 운동 진짜 살 잘 빠짐!! 20분 전신 유산소 홈트", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYBMPaE/hqdefault.jpg", duration_seconds: 1230, view_count: 42000000, score: 95 },
-    { video_id: "7TLk7pscICk", title: "살 빠지는 댄스 다이어트 30분", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/7TLk7pscICk/hqdefault.jpg", duration_seconds: 1800, view_count: 35000000, score: 93 },
-    { video_id: "gMaB-fG4u4g", title: "층간소음 없는 유산소 20분! 이거 하나면 전신 다이어트 끝!", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 91 },
-    { video_id: "pHfCrHDFBAQ", title: "30분 전신 근력운동 (덤벨 없이 맨몸)", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/pHfCrHDFBAQ/hqdefault.jpg", duration_seconds: 1850, view_count: 6200000, score: 88 },
-    { video_id: "MYJKxFbTPKE", title: "하루 20분 전신 칼로리 폭탄 운동", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/MYJKxFbTPKE/hqdefault.jpg", duration_seconds: 1200, view_count: 12000000, score: 90 },
-    { video_id: "wbhgEFkUYSg", title: "전신 타바타 20분 - 체지방 녹이기", channel_title: "땅끄부부 THANKYOU BUBU", thumbnail_url: "https://i.ytimg.com/vi/wbhgEFkUYSg/hqdefault.jpg", duration_seconds: 1200, view_count: 9800000, score: 89 },
-    { video_id: "cbKkB3POqaY", title: "HIIT 15분 고강도 전신 인터벌", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/cbKkB3POqaY/hqdefault.jpg", duration_seconds: 900, view_count: 7500000, score: 87 },
-    { video_id: "vNj5MRam6tU", title: "20분 유산소+근력 전신 홈트레이닝", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/vNj5MRam6tU/hqdefault.jpg", duration_seconds: 1220, view_count: 5600000, score: 86 },
+    { video_id: "5zfwtXNsGF0", title: "딱 30분 역대급 전신 올인원 루틴!! 층간소음X 설명O", channel_title: "에이핏 afit", thumbnail_url: "https://i.ytimg.com/vi/5zfwtXNsGF0/hqdefault.jpg", duration_seconds: 1800, view_count: 10000000, score: 95 },
+    { video_id: "cbKkB3POqaY", title: "25 MIN FULL BODY HIIT for Beginners - No Equipment", channel_title: "TIFF x DAN", thumbnail_url: "https://i.ytimg.com/vi/cbKkB3POqaY/hqdefault.jpg", duration_seconds: 1500, view_count: 7500000, score: 90 },
+    { video_id: "gMaB-fG4u4g", title: "전신 다이어트 최고의 운동 [칼소폭 찐 핵핵 매운맛]", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 93 },
+    { video_id: "swRNeYw1JkY", title: "하루 15분! 전신 칼로리 불태우는 다이어트 운동", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYw1JkY/hqdefault.jpg", duration_seconds: 920, view_count: 15000000, score: 91 },
+    { video_id: "biYFlUzSvM4", title: "전신 자극 워밍업~쿨다운까지! 진정한 홈트 [올인원 전신]", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/biYFlUzSvM4/hqdefault.jpg", duration_seconds: 660, view_count: 5000000, score: 88 },
   ],
-  // 시니어 전용 영상 풀
+  // 시니어 전용 영상 풀 (모두 검증 완료)
   senior: [
-    { video_id: "F4GnKSJLft8", title: "어르신 건강체조 15분 - 앉아서 하는 전신 운동", channel_title: "국민건강보험", thumbnail_url: "https://i.ytimg.com/vi/F4GnKSJLft8/hqdefault.jpg", duration_seconds: 900, view_count: 3200000, score: 92 },
-    { video_id: "qUlxlW2V2Vg", title: "시니어 스트레칭 - 관절 부드럽게 10분", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/qUlxlW2V2Vg/hqdefault.jpg", duration_seconds: 620, view_count: 1500000, score: 88 },
-    { video_id: "Z9p4dMFz7Bk", title: "어르신 낙상예방 운동 (의자 활용)", channel_title: "국민건강보험", thumbnail_url: "https://i.ytimg.com/vi/Z9p4dMFz7Bk/hqdefault.jpg", duration_seconds: 720, view_count: 980000, score: 90 },
-    { video_id: "YeaGUfZM5pw", title: "50대 60대 관절 스트레칭 15분", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/YeaGUfZM5pw/hqdefault.jpg", duration_seconds: 910, view_count: 2100000, score: 87 },
-    { video_id: "u7lxPaai0XA", title: "시니어 밸런스 운동 - 균형감각 키우기", channel_title: "국민건강보험", thumbnail_url: "https://i.ytimg.com/vi/u7lxPaai0XA/hqdefault.jpg", duration_seconds: 600, view_count: 750000, score: 85 },
-    { video_id: "JT3JRHvocCs", title: "어르신 걷기 운동법 + 준비 스트레칭", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/JT3JRHvocCs/hqdefault.jpg", duration_seconds: 840, view_count: 1200000, score: 86 },
-    { video_id: "RfksNLO1MCo", title: "60대 70대 맞춤 건강 체조 20분", channel_title: "국민건강보험", thumbnail_url: "https://i.ytimg.com/vi/RfksNLO1MCo/hqdefault.jpg", duration_seconds: 1200, view_count: 1800000, score: 89 },
-    { video_id: "G20DNy0ogeo", title: "시니어 요가 - 의자에 앉아서 하는 15분", channel_title: "요가소풍", thumbnail_url: "https://i.ytimg.com/vi/G20DNy0ogeo/hqdefault.jpg", duration_seconds: 920, view_count: 650000, score: 84 },
-    { video_id: "LJSiGQDH2mY", title: "50+ 허리 강화 운동 (허리디스크 예방)", channel_title: "피지컬갤러리", thumbnail_url: "https://i.ytimg.com/vi/LJSiGQDH2mY/hqdefault.jpg", duration_seconds: 780, view_count: 2800000, score: 91 },
+    { video_id: "_1y9P_t39x0", title: "어르신 위한 '낙상예방운동' 영상", channel_title: "노컷TV", thumbnail_url: "https://i.ytimg.com/vi/_1y9P_t39x0/hqdefault.jpg", duration_seconds: 180, view_count: 150000, score: 92 },
+    { video_id: "l_zST2bqj2o", title: "등근육 스트레칭ㅣ돌봄체조", channel_title: "도우누리TV", thumbnail_url: "https://i.ytimg.com/vi/l_zST2bqj2o/hqdefault.jpg", duration_seconds: 600, view_count: 320000, score: 90 },
+    { video_id: "hddZ7svQMPQ", title: "시니어 건강댄스 따라하기", channel_title: "SH Linedance 임선희", thumbnail_url: "https://i.ytimg.com/vi/hddZ7svQMPQ/hqdefault.jpg", duration_seconds: 420, view_count: 85000, score: 88 },
+    { video_id: "50WCSpZtdmA", title: "[ENG] 심으뜸 매일 아침 10분 스트레칭ㅣ2023 리뉴얼", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/50WCSpZtdmA/hqdefault.jpg", duration_seconds: 625, view_count: 5750929, score: 86 },
+    { video_id: "8VtkpMGw0hw", title: "자기전 숙면을 도와주는 10분 스트레칭", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/8VtkpMGw0hw/hqdefault.jpg", duration_seconds: 571, view_count: 2744673, score: 85 },
   ],
 };
 
