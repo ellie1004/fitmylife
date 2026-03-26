@@ -88,8 +88,8 @@ export interface GoalTracker {
   startDate: string;
   // 운동 완료한 날짜 목록 (ISO date strings, 중복 없음)
   completedDates: string[];
-  // 현재 활성 목표 (7일/21일/100일)
-  activeGoal: 7 | 21 | 100;
+  // 현재 활성 목표 (3일/7일/21일/100일)
+  activeGoal: 3 | 7 | 21 | 100;
   // 이전에 본 영상 ID 목록 (랜덤 로테이션용)
   watchedVideoIds: string[];
 }

@@ -22,7 +22,7 @@ function loadGoal(): GoalTracker {
   return {
     startDate: new Date().toISOString().split("T")[0],
     completedDates: [],
-    activeGoal: 7,
+    activeGoal: 3,
     watchedVideoIds: [],
   };
 }
@@ -38,7 +38,7 @@ function saveGoal(goal: GoalTracker) {
 
 interface GoalState extends GoalTracker {
   // 목표 변경
-  setGoal: (goal: 7 | 21 | 100) => void;
+  setGoal: (goal: 3 | 7 | 21 | 100) => void;
   // 오늘 운동 완료 체크
   markTodayComplete: () => void;
   // 오늘 운동 완료 여부
@@ -50,7 +50,7 @@ interface GoalState extends GoalTracker {
   // 연속 운동 일수 (streak)
   streak: () => number;
   // 목표 리셋 (새 목표 시작)
-  resetGoal: (goal?: 7 | 21 | 100) => void;
+  resetGoal: (goal?: 3 | 7 | 21 | 100) => void;
 }
 
 export const useGoalStore = create<GoalState>((set, get) => {

@@ -40,8 +40,9 @@ const TYPE_LABEL: Record<string, string> = {
   strength: "근력 운동",
 };
 
-const GOALS = [7, 21, 100] as const;
+const GOALS = [3, 7, 21, 100] as const;
 const GOAL_LABELS: Record<number, { label: string; emoji: string; desc: string }> = {
+  3:   { label: "3일", emoji: "✊", desc: "작심 3일 깨부수기" },
   7:   { label: "7일", emoji: "🌱", desc: "운동 습관 만들기" },
   21:  { label: "21일", emoji: "💪", desc: "습관 고정하기" },
   100: { label: "100일", emoji: "🔥", desc: "인생이 바뀌는 도전" },
@@ -197,7 +198,9 @@ export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
               }}
             >
               <Text style={styles.goalUpgradeBtnText}>
-                {goal.activeGoal === 7
+                {goal.activeGoal === 3
+                  ? "7일 도전 →"
+                  : goal.activeGoal === 7
                   ? "21일 도전 →"
                   : goal.activeGoal === 21
                   ? "100일 도전 →"
