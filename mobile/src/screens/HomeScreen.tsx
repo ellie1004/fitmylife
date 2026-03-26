@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Linking,
 } from "react-native";
 import ProgressBar from "../components/ProgressBar";
 import { useWorkoutStore } from "../stores/workoutStore";
@@ -141,6 +142,16 @@ export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
       <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
         <Text style={styles.restartText}>체크리스트 다시하기</Text>
       </TouchableOpacity>
+
+      {/* 하단 크레딧 */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Designed by </Text>
+        <TouchableOpacity
+          onPress={() => Linking.openURL("https://nugunaai.com/")}
+        >
+          <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -323,6 +334,23 @@ const styles = StyleSheet.create({
   restartText: {
     fontSize: 14,
     color: COLORS.textLight,
+    textDecorationLine: "underline",
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 24,
+    paddingBottom: 8,
+  },
+  footerText: {
+    fontSize: 11,
+    color: "#9CA3AF",
+  },
+  footerLink: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: COLORS.accent,
     textDecorationLine: "underline",
   },
 });

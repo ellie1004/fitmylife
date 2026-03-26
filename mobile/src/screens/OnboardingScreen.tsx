@@ -1,8 +1,8 @@
 /**
  * 온보딩 & 체크리스트 진단 스크린
  *
- * 1) 사용자 기본 정보 입력 (나이, 성별)
- * 2) 18개 체크리스트 질문에 순차 응답
+ * 1) 사용자 기본 정보 입력 (닉네임, 나이, 성별)
+ * 2) 18개 체크리스트 질문에 순차 응답 — 운동 동기부여 문구 포함
  * 3) 완료 시 운동처방 생성 → HomeScreen으로 이동
  */
 
@@ -18,6 +18,7 @@ import {
   Animated,
   KeyboardAvoidingView,
   Platform,
+  Linking,
 } from "react-native";
 import ChecklistCard from "../components/ChecklistCard";
 import { fetchQuestions, generatePrescription } from "../services/api";
@@ -34,6 +35,37 @@ const COLORS = {
   text: "#1A1A2E",
   textLight: "#6B7280",
 };
+
+// 체크리스트 진행 중 보여줄 동기부여 문구 (카테고리별)
+const MOTIVATIONAL_QUOTES: Record<string, { emoji: string; text: string }[]> = {
+  physical_activity: [
+    { emoji: "🏃‍♂️", text: "몸이 움직이면 마음도 움직여요" },
+    { emoji: "💪", text: "작은 움직임이 큰 변화의 시작!" },
+  ],
+  diet: [
+    { emoji: "🥗", text: "잘 먹는 것도 운동의 일부예요" },
+    { emoji: "🍎", text: "좋은 연료가 좋은 퍼포먼스를 만들어요" },
+  ],
+  sleep: [
+    { emoji: "😴", text: "충분한 휴식이 근육을 만들어요" },
+    { emoji: "🌙", text: "잠자는 동안 몸이 회복돼요" },
+  ],
+  stress: [
+    { emoji: "🧘‍♀️", text: "운동은 최고의 스트레스 해소법!" },
+    { emoji: "🌊", text: "깊은 호흡, 그리고 한 발짝" },
+  ],
+  health_status: [
+    { emoji: "❤️", text: "건강이 최고의 재산이에요" },
+    { emoji: "🩺", text: "내 몸을 아는 것이 첫걸음" },
+  ],
+  exercise_experience: [
+    { emoji: "🔥", text: "경험은 상관없어요, 시작이 반!" },
+    { emoji: "🏆", text: "어제의 나보다 오늘의 내가 더 강해요" },
+  ],
+};
+
+// 로딩 화면 운동 이모지 애니메이션 시퀀스
+const LOADING_EMOJIS = ["🏋️", "🧘‍♀️", "🏃‍♂️", "🚴‍♀️", "🤸‍♀️", "🏊‍♀️"];
 
 interface Props {
   onComplete: () => void;
@@ -56,6 +88,8 @@ export default function OnboardingScreen({ onComplete }: Props) {
 
   // 애니메이션
   const fadeAnim = useState(new Animated.Value(1))[0];
+  const loadingEmojiIndex = useState(new Animated.Value(0))[0];
+  const [currentLoadingEmoji, setCurrentLoadingEmoji] = useState(0);
 
   const { setProfile } = useUserStore();
   const { setWorkoutPlan, setChecklistResult } = useWorkoutStore();
@@ -68,6 +102,15 @@ export default function OnboardingScreen({ onComplete }: Props) {
         // 오프라인 폴백: 빈 질문 → 기본 처방
       });
   }, []);
+
+  // 로딩 이모지 순환
+  useEffect(() => {
+    if (step !== "loading") return;
+    const interval = setInterval(() => {
+      setCurrentLoadingEmoji((prev) => (prev + 1) % LOADING_EMOJIS.length);
+    }, 600);
+    return () => clearInterval(interval);
+  }, [step]);
 
   // 카드 전환 애니메이션
   const animateTransition = (callback: () => void) => {
@@ -139,6 +182,14 @@ export default function OnboardingScreen({ onComplete }: Props) {
     }
   };
 
+  // 현재 질문의 동기부여 문구 가져오기
+  const getMotivation = () => {
+    if (!questions[currentQ]) return null;
+    const cat = questions[currentQ].category;
+    const quotes = MOTIVATIONAL_QUOTES[cat] || MOTIVATIONAL_QUOTES.physical_activity;
+    return quotes[currentQ % quotes.length];
+  };
+
   // ── 프로필 입력 단계 ──
   if (step === "profile") {
     return (
@@ -150,6 +201,11 @@ export default function OnboardingScreen({ onComplete }: Props) {
           contentContainerStyle={styles.profileContainer}
           keyboardShouldPersistTaps="handled"
         >
+          {/* 상단 운동 이모지 장식 */}
+          <View style={styles.profileHeroEmojis}>
+            <Text style={styles.heroEmojiText}>🏋️  🧘‍♀️  🏃‍♂️</Text>
+          </View>
+
           <Text style={styles.logo}>FitMyLife</Text>
           <Text style={styles.subtitle}>
             나에게 딱 맞는 운동을 찾아볼까요?
@@ -214,14 +270,24 @@ export default function OnboardingScreen({ onComplete }: Props) {
               (!nickname.trim() || !age || !gender) && styles.ctaDisabled,
             ]}
             onPress={handleProfileDone}
-            disabled={!age || !gender}
+            disabled={!nickname.trim() || !age || !gender}
           >
-            <Text style={styles.ctaText}>진단 시작하기</Text>
+            <Text style={styles.ctaText}>⚡ 진단 시작하기</Text>
           </TouchableOpacity>
 
           <Text style={styles.disclaimer}>
             본 앱은 의료적 진단이 아닌 건강 관리 목적으로 제공됩니다.
           </Text>
+
+          {/* 하단 크레딧 */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Designed by </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL("https://nugunaai.com/")}
+            >
+              <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     );
@@ -231,13 +297,22 @@ export default function OnboardingScreen({ onComplete }: Props) {
   if (step === "loading") {
     return (
       <View style={[styles.screen, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingEmoji}>
+          {LOADING_EMOJIS[currentLoadingEmoji]}
+        </Text>
         <Text style={styles.loadingText}>
           AI가 맞춤 운동 프로그램을{"\n"}만들고 있어요...
         </Text>
-        <Text style={styles.loadingSubtext}>
-          체크리스트 분석 중 → FITT-VP 산출 중 → 영상 큐레이션 중
-        </Text>
+        <View style={styles.loadingSteps}>
+          <Text style={styles.loadingStep}>✅ 체크리스트 분석 완료</Text>
+          <Text style={styles.loadingStep}>⏳ FITT-VP 처방 산출 중...</Text>
+          <Text style={styles.loadingStepPending}>⬜ YouTube 영상 큐레이션</Text>
+        </View>
+        <ActivityIndicator
+          size="small"
+          color={COLORS.accent}
+          style={{ marginTop: 20 }}
+        />
       </View>
     );
   }
@@ -253,17 +328,29 @@ export default function OnboardingScreen({ onComplete }: Props) {
     );
   }
 
+  const motivation = getMotivation();
+
   return (
     <View style={styles.screen}>
       <View style={styles.checklistHeader}>
-        {currentQ > 0 && (
+        {currentQ > 0 ? (
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Text style={styles.backText}>← 이전</Text>
           </TouchableOpacity>
+        ) : (
+          <View style={{ width: 60 }} />
         )}
         <Text style={styles.headerTitle}>라이프스타일 진단</Text>
         <View style={{ width: 60 }} />
       </View>
+
+      {/* 동기부여 문구 배너 */}
+      {motivation && (
+        <View style={styles.motivationBanner}>
+          <Text style={styles.motivationEmoji}>{motivation.emoji}</Text>
+          <Text style={styles.motivationText}>{motivation.text}</Text>
+        </View>
+      )}
 
       <View style={styles.cardWrapper}>
         <Animated.View style={{ opacity: fadeAnim }}>
@@ -275,6 +362,16 @@ export default function OnboardingScreen({ onComplete }: Props) {
             onSelect={handleSelect}
           />
         </Animated.View>
+      </View>
+
+      {/* 하단 크레딧 */}
+      <View style={styles.footerChecklist}>
+        <Text style={styles.footerText}>Designed by </Text>
+        <TouchableOpacity
+          onPress={() => Linking.openURL("https://nugunaai.com/")}
+        >
+          <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -291,6 +388,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 24,
     paddingBottom: 40,
+  },
+  profileHeroEmojis: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  heroEmojiText: {
+    fontSize: 36,
+    letterSpacing: 8,
   },
   logo: {
     fontSize: 36,
@@ -362,12 +467,12 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   ctaButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.accent,
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: 28,
     alignItems: "center",
-    shadowColor: COLORS.primary,
+    shadowColor: COLORS.accent,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -396,7 +501,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 60,
-    paddingBottom: 12,
+    paddingBottom: 8,
   },
   backButton: {
     width: 60,
@@ -411,6 +516,30 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.text,
   },
+  // 동기부여 배너
+  motivationBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 4,
+    backgroundColor: "#EBF3FB",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: COLORS.primary,
+  },
+  motivationEmoji: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  motivationText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.primary,
+    flex: 1,
+  },
   cardWrapper: {
     flex: 1,
     justifyContent: "center",
@@ -421,18 +550,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 40,
   },
+  loadingEmoji: {
+    fontSize: 56,
+    marginBottom: 16,
+  },
   loadingText: {
     fontSize: 18,
     fontWeight: "700",
     color: COLORS.text,
     textAlign: "center",
-    marginTop: 24,
+    marginTop: 8,
     lineHeight: 28,
   },
-  loadingSubtext: {
-    fontSize: 13,
+  loadingSteps: {
+    marginTop: 24,
+    alignItems: "flex-start",
+  },
+  loadingStep: {
+    fontSize: 14,
+    color: COLORS.accent,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  loadingStepPending: {
+    fontSize: 14,
     color: COLORS.textLight,
-    textAlign: "center",
-    marginTop: 12,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  // 하단 크레딧
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  footerChecklist: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 24,
+  },
+  footerText: {
+    fontSize: 11,
+    color: "#9CA3AF",
+  },
+  footerLink: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: COLORS.accent,
+    textDecorationLine: "underline",
   },
 });

@@ -3,6 +3,7 @@
  *
  * 한 번에 하나의 질문을 카드 형태로 보여주고
  * 5점 리커트 척도 버튼으로 답변을 받습니다.
+ * 카테고리별 운동 관련 아이콘 장식 포함.
  */
 
 import React from "react";
@@ -22,6 +23,19 @@ const COLORS = {
   selectedText: "#FFFFFF",
 };
 
+// 카테고리별 아이콘과 액센트 컬러
+const CATEGORY_STYLE: Record<
+  string,
+  { emoji: string; label: string; color: string }
+> = {
+  physical_activity: { emoji: "🏃‍♂️", label: "신체활동", color: "#2E75B6" },
+  diet: { emoji: "🥗", label: "식습관", color: "#4CAF50" },
+  sleep: { emoji: "🌙", label: "수면", color: "#7C3AED" },
+  stress: { emoji: "🧘‍♀️", label: "스트레스", color: "#F59E0B" },
+  health_status: { emoji: "❤️", label: "건강상태", color: "#EF4444" },
+  exercise_experience: { emoji: "💪", label: "운동경험", color: "#FF9800" },
+};
+
 interface Props {
   question: ChecklistQuestion;
   currentIndex: number;
@@ -37,23 +51,26 @@ export default function ChecklistCard({
   selectedValue,
   onSelect,
 }: Props) {
-  // 카테고리 한글 라벨
-  const categoryLabels: Record<string, string> = {
-    physical_activity: "신체활동",
-    diet: "식습관",
-    sleep: "수면",
-    stress: "스트레스",
-    health_status: "건강상태",
-    exercise_experience: "운동경험",
+  const catStyle = CATEGORY_STYLE[question.category] || {
+    emoji: "📋",
+    label: question.category,
+    color: COLORS.primary,
   };
+
+  const progress = ((currentIndex + 1) / totalCount) * 100;
 
   return (
     <View style={styles.container}>
-      {/* 진행 상태 */}
+      {/* 카테고리 배지 + 진행 카운터 */}
       <View style={styles.progressRow}>
-        <Text style={styles.category}>
-          {categoryLabels[question.category] || question.category}
-        </Text>
+        <View
+          style={[styles.categoryBadge, { backgroundColor: catStyle.color + "15" }]}
+        >
+          <Text style={styles.categoryEmoji}>{catStyle.emoji}</Text>
+          <Text style={[styles.categoryLabel, { color: catStyle.color }]}>
+            {catStyle.label}
+          </Text>
+        </View>
         <Text style={styles.counter}>
           {currentIndex + 1} / {totalCount}
         </Text>
@@ -64,7 +81,10 @@ export default function ChecklistCard({
         <View
           style={[
             styles.progressBarFill,
-            { width: `${((currentIndex + 1) / totalCount) * 100}%` },
+            {
+              width: `${progress}%`,
+              backgroundColor: catStyle.color,
+            },
           ]}
         />
       </View>
@@ -80,7 +100,13 @@ export default function ChecklistCard({
           return (
             <TouchableOpacity
               key={value}
-              style={[styles.optionButton, isSelected && styles.optionSelected]}
+              style={[
+                styles.optionButton,
+                isSelected && {
+                  borderColor: catStyle.color,
+                  backgroundColor: catStyle.color + "10",
+                },
+              ]}
               onPress={() => onSelect(value)}
               activeOpacity={0.7}
             >
@@ -88,15 +114,25 @@ export default function ChecklistCard({
                 <View
                   style={[
                     styles.radioCircle,
-                    isSelected && styles.radioSelected,
+                    isSelected && { borderColor: catStyle.color },
                   ]}
                 >
-                  {isSelected && <View style={styles.radioInner} />}
+                  {isSelected && (
+                    <View
+                      style={[
+                        styles.radioInner,
+                        { backgroundColor: catStyle.color },
+                      ]}
+                    />
+                  )}
                 </View>
                 <Text
                   style={[
                     styles.optionText,
-                    isSelected && styles.optionTextSelected,
+                    isSelected && {
+                      fontWeight: "600",
+                      color: catStyle.color,
+                    },
                   ]}
                 >
                   {option}
@@ -106,6 +142,17 @@ export default function ChecklistCard({
           );
         })}
       </View>
+
+      {/* 하단 응원 텍스트 */}
+      {progress >= 50 && (
+        <Text style={styles.cheerText}>
+          {progress >= 90
+            ? "🔥 거의 다 왔어요! 마지막 스퍼트!"
+            : progress >= 70
+            ? "💪 절반 넘었어요! 힘내세요!"
+            : "👍 잘하고 있어요!"}
+        </Text>
+      )}
     </View>
   );
 }
@@ -126,13 +173,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  category: {
-    fontSize: 13,
+  categoryBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  categoryEmoji: {
+    fontSize: 14,
+    marginRight: 6,
+  },
+  categoryLabel: {
+    fontSize: 12,
     fontWeight: "700",
-    color: COLORS.primary,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   counter: {
     fontSize: 13,
@@ -148,7 +205,6 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: "100%",
-    backgroundColor: COLORS.primary,
     borderRadius: 2,
   },
   questionText: {
@@ -169,10 +225,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: COLORS.bg,
   },
-  optionSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: "#EBF3FB",
-  },
   optionRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -187,22 +239,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 12,
   },
-  radioSelected: {
-    borderColor: COLORS.primary,
-  },
   radioInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: COLORS.primary,
   },
   optionText: {
     fontSize: 15,
     color: COLORS.text,
     flex: 1,
   },
-  optionTextSelected: {
+  cheerText: {
+    textAlign: "center",
+    fontSize: 12,
     fontWeight: "600",
-    color: COLORS.primary,
+    color: COLORS.accent,
+    marginTop: 16,
   },
 });

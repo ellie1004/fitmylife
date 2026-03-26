@@ -9,6 +9,7 @@ import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import WelcomeScreen from "./src/screens/WelcomeScreen";
 import OnboardingScreen from "./src/screens/OnboardingScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import WorkoutScreen from "./src/screens/WorkoutScreen";
@@ -61,27 +62,28 @@ const DEMO_PLAN: WorkoutPlan = {
   message: "무리하지 않는 선에서 천천히 시작해요! 🌱",
 };
 
-type Screen = "onboarding" | "home" | "workout" | "player";
+type Screen = "welcome" | "onboarding" | "home" | "workout" | "player";
 
 export default function App() {
   const { workoutPlan, setWorkoutPlan } = useWorkoutStore();
   const { profile, setProfile } = useUserStore();
 
-  // 워크아웃 플랜이 없으면 데모 데이터로 홈 화면 표시
+  // 첫 진입 시 웰컴 화면, 이미 플랜이 있으면 홈으로
   const [screen, setScreen] = useState<Screen>(
-    workoutPlan ? "home" : "home"
+    workoutPlan ? "home" : "welcome"
   );
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const { reset } = useWorkoutStore();
 
+  // 데모 데이터는 체크리스트 완료 후 홈 진입 시에만 적용
   useEffect(() => {
-    if (!workoutPlan) {
+    if (screen === "home" && !workoutPlan) {
       setWorkoutPlan(DEMO_PLAN);
     }
-    if (!profile) {
+    if (screen === "home" && !profile) {
       setProfile({ age: 30, gender: "female", nickname: "게스트" });
     }
-  }, []);
+  }, [screen]);
 
   const handleSelectVideo = (videoId: string) => {
     setSelectedVideoId(videoId);
@@ -95,7 +97,11 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
+      <StatusBar style={screen === "welcome" ? "light" : "dark"} />
+
+      {screen === "welcome" && (
+        <WelcomeScreen onStart={() => setScreen("onboarding")} />
+      )}
 
       {screen === "onboarding" && (
         <OnboardingScreen onComplete={() => setScreen("home")} />
