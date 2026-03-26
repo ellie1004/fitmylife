@@ -138,6 +138,24 @@ export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
         <Text style={styles.startButtonText}>▶  오늘의 운동 시작하기</Text>
       </TouchableOpacity>
 
+      {/* 온라인 스포츠 센터 참고 링크 */}
+      <TouchableOpacity
+        style={styles.refCard}
+        onPress={() =>
+          Linking.openURL("https://www.ksponco.or.kr/onlinesports/")
+        }
+        activeOpacity={0.7}
+      >
+        <Text style={styles.refIcon}>🏅</Text>
+        <View style={styles.refTextWrap}>
+          <Text style={styles.refTitle}>국민체육진흥공단 온라인 스포츠센터</Text>
+          <Text style={styles.refDesc}>
+            더 다양한 운동 콘텐츠가 궁금하다면 참고해보세요!
+          </Text>
+        </View>
+        <Text style={styles.refArrow}>→</Text>
+      </TouchableOpacity>
+
       {/* 다시 진단하기 */}
       <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
         <Text style={styles.restartText}>체크리스트 다시하기</Text>
@@ -325,6 +343,41 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 17,
     fontWeight: "700",
+  },
+  refCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginTop: 20,
+    backgroundColor: "#FFFBEB",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+  },
+  refIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  refTextWrap: {
+    flex: 1,
+  },
+  refTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  refDesc: {
+    fontSize: 11,
+    color: COLORS.textLight,
+    lineHeight: 16,
+  },
+  refArrow: {
+    fontSize: 18,
+    color: COLORS.warning,
+    fontWeight: "700",
+    marginLeft: 8,
   },
   restartButton: {
     alignItems: "center",
