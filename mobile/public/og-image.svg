@@ -1,0 +1,25 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D0D0D"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- accent line -->
+  <rect x="80" y="180" width="50" height="4" rx="2" fill="#4CAF50"/>
+  <!-- tagline -->
+  <text x="80" y="160" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#4CAF50" letter-spacing="4">YOUR FITNESS JOURNEY</text>
+  <!-- logo -->
+  <text x="80" y="270" font-family="Arial,sans-serif" font-size="72" font-weight="900" fill="#FFFFFF">FitMyLife</text>
+  <!-- subtitle -->
+  <text x="80" y="330" font-family="Arial,sans-serif" font-size="28" font-weight="600" fill="rgba(255,255,255,0.8)">AI가 분석하는 나만의 맞춤 운동 프로그램</text>
+  <!-- description -->
+  <text x="80" y="380" font-family="Arial,sans-serif" font-size="20" fill="rgba(255,255,255,0.5)">3분 체크리스트로 나의 운동 처방전 받기</text>
+  <!-- fitness emojis -->
+  <text x="80" y="480" font-family="Arial,sans-serif" font-size="48">🏋️ 🧘‍♀️ 🏃‍♂️ 💪 🔥</text>
+  <!-- credit -->
+  <text x="80" y="570" font-family="Arial,sans-serif" font-size="16" fill="rgba(255,255,255,0.3)">Designed by NuGuNaAi Ellie</text>
+  <!-- green accent bar bottom -->
+  <rect x="0" y="620" width="1200" height="10" fill="#4CAF50"/>
+</svg>
