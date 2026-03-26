@@ -67,9 +67,6 @@ export default function WorkoutScreen({ onSelectVideo, onBack }: Props) {
             </Text>
           </View>
           <View style={styles.bannerTag}>
-            <Text style={styles.bannerTagText}>{fitt.time_minutes}분</Text>
-          </View>
-          <View style={styles.bannerTag}>
             <Text style={styles.bannerTagText}>{target_area}</Text>
           </View>
         </View>
