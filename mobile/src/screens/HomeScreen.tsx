@@ -54,6 +54,86 @@ const SENIOR_SITES = [
   { name: "100세 건강체조", url: "https://www.ksponco.or.kr/onlinesports/", desc: "온라인 스포츠센터 시니어 프로그램" },
 ];
 
+// 나이·성별 기반 일반 권장 식단 (의학적 조언이 아닌 일반 건강 정보)
+function getDietTips(age: number, gender: "male" | "female"): { title: string; tips: string[]; calories: string } {
+  const isSenior = age >= 60;
+  const isYoung = age < 30;
+
+  if (isSenior) {
+    return {
+      title: "시니어 건강 식단 가이드",
+      calories: gender === "male" ? "1,800~2,200 kcal/일" : "1,600~2,000 kcal/일",
+      tips: [
+        "🥛 칼슘·비타민D 충분히 (우유, 멸치, 달걀)",
+        "🍖 근감소 예방을 위해 단백질 매끼 섭취 (두부, 생선, 닭가슴살)",
+        "🥬 식이섬유 풍부한 채소·과일 하루 5접시 이상",
+        "💧 수분 섭취 하루 6~8잔 (갈증 느끼기 전에 마시기)",
+        "🧂 나트륨 줄이기 — 국물 반만 드세요",
+      ],
+    };
+  }
+
+  if (gender === "male") {
+    return {
+      title: isYoung ? "20대 남성 활력 식단" : "30~50대 남성 균형 식단",
+      calories: isYoung ? "2,400~2,800 kcal/일" : "2,200~2,600 kcal/일",
+      tips: [
+        "🍗 단백질 체중 1kg당 1.2~1.6g (닭가슴살, 달걀, 두부)",
+        "🍚 탄수화물은 현미·잡곡 위주로 (백미 줄이기)",
+        "🥑 건강한 지방 섭취 (아보카도, 견과류, 올리브오일)",
+        "🥦 매끼 채소 반찬 2가지 이상",
+        "🍺 음주 줄이기 — 주 2회 이하, 1회 소주 2잔 이내",
+      ],
+    };
+  }
+
+  return {
+    title: isYoung ? "20대 여성 건강 식단" : "30~50대 여성 균형 식단",
+    calories: isYoung ? "1,800~2,200 kcal/일" : "1,800~2,000 kcal/일",
+    tips: [
+      "🥗 철분 풍부한 식품 (시금치, 소고기, 두부) 꾸준히 섭취",
+      "🍖 단백질 매끼 한 주먹 (달걀, 생선, 콩류, 닭가슴살)",
+      "🥛 뼈 건강을 위해 칼슘·비타민D (우유, 요거트, 달걀)",
+      "🫐 항산화 식품 챙기기 (베리류, 토마토, 브로콜리)",
+      "💧 하루 물 8잔 이상 — 피부와 대사에 필수!",
+    ],
+  };
+}
+
+// 강도별 상세 운동 처방 안내
+function getDetailedPrescription(intensity: string, exerciseType: string, timeMin: number): string[] {
+  const common = [
+    `⏱️ 운동 전 5분 워밍업 + 운동 후 5분 쿨다운을 꼭 포함하세요`,
+    `💧 운동 중 15~20분 간격으로 물을 한 모금씩 마셔주세요`,
+  ];
+
+  if (intensity === "low") {
+    return [
+      ...common,
+      `🎯 ${timeMin}분 동안 가볍게 몸을 풀어주는 스트레칭 위주로 진행하세요`,
+      `🚶 무리하지 말고 통증이 느껴지면 즉시 멈추세요`,
+      `📅 일주일에 쉬는 날을 충분히 두고 점진적으로 늘려가세요`,
+      `👟 맨발보다는 쿠셔닝 있는 실내화를 추천드려요`,
+    ];
+  }
+  if (intensity === "moderate") {
+    return [
+      ...common,
+      `🎯 ${timeMin}분 동안 약간 숨이 찰 정도의 강도를 유지하세요`,
+      `💪 "대화는 가능하지만 노래는 어려운" 정도가 적당합니다`,
+      `📅 운동 후 48시간 회복 시간을 두면 근육 성장에 효과적이에요`,
+      `🍌 운동 30분 전 바나나 하나, 운동 후 30분 내 단백질 섭취 추천!`,
+    ];
+  }
+  return [
+    ...common,
+    `🎯 ${timeMin}분 고강도 운동 — 심박수 최대의 70~85% 유지`,
+    `🔥 운동 후에도 칼로리가 소모되는 "애프터번 효과"를 노려보세요`,
+    `📅 고강도 운동은 연속하지 말고 중간에 저강도 운동으로 교차하세요`,
+    `🥩 근육 회복을 위해 운동 후 단백질 20~30g 섭취 필수!`,
+  ];
+}
+
 interface Props {
   onStartWorkout: () => void;
   onRestart: () => void;
@@ -274,6 +354,35 @@ export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
         </View>
       </View>
 
+      {/* ── 상세 운동 가이드 ── */}
+      <View style={styles.detailCard}>
+        <Text style={styles.sectionTitle}>📋 운동 가이드</Text>
+        {getDetailedPrescription(fitt.intensity, fitt.exercise_type, fitt.time_minutes).map((tip, i) => (
+          <Text key={i} style={styles.detailTip}>{tip}</Text>
+        ))}
+      </View>
+
+      {/* ── 맞춤 식단 가이드 ── */}
+      {profile && (
+        <View style={styles.dietCard}>
+          <Text style={styles.sectionTitle}>
+            🍽️ {getDietTips(profile.age, profile.gender).title}
+          </Text>
+          <View style={styles.dietCalorieBox}>
+            <Text style={styles.dietCalorieLabel}>일일 권장 칼로리</Text>
+            <Text style={styles.dietCalorieValue}>
+              {getDietTips(profile.age, profile.gender).calories}
+            </Text>
+          </View>
+          {getDietTips(profile.age, profile.gender).tips.map((tip, i) => (
+            <Text key={i} style={styles.dietTip}>{tip}</Text>
+          ))}
+          <Text style={styles.dietDisclaimer}>
+            * 일반적인 건강 정보이며 의학적 조언이 아닙니다
+          </Text>
+        </View>
+      )}
+
       {/* 오늘의 운동 프리뷰 */}
       <View style={styles.previewCard}>
         <View style={styles.previewHeader}>
@@ -421,6 +530,32 @@ const styles = StyleSheet.create({
     marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
     borderRadius: 20, padding: 20,
     shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
+  },
+  // ── 상세 운동 가이드 ──
+  detailCard: {
+    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
+    borderRadius: 20, padding: 20,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
+  },
+  detailTip: {
+    fontSize: 13, color: COLORS.text, lineHeight: 22, marginBottom: 8, paddingLeft: 4,
+  },
+  // ── 식단 가이드 ──
+  dietCard: {
+    marginHorizontal: 16, marginTop: 16, backgroundColor: "#F0FFF4",
+    borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#C6F6D5",
+  },
+  dietCalorieBox: {
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    backgroundColor: COLORS.card, borderRadius: 12, padding: 14, marginBottom: 16,
+  },
+  dietCalorieLabel: { fontSize: 13, fontWeight: "600", color: COLORS.textLight },
+  dietCalorieValue: { fontSize: 16, fontWeight: "800", color: COLORS.accent },
+  dietTip: {
+    fontSize: 13, color: COLORS.text, lineHeight: 22, marginBottom: 8, paddingLeft: 4,
+  },
+  dietDisclaimer: {
+    fontSize: 10, color: "#9CA3AF", textAlign: "center", marginTop: 8, fontStyle: "italic",
   },
   fittGrid: { flexDirection: "row", justifyContent: "space-around", alignItems: "center" },
   fittItem: { alignItems: "center", flex: 1 },

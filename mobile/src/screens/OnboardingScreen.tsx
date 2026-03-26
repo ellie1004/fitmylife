@@ -80,6 +80,8 @@ export default function OnboardingScreen({ onComplete }: Props) {
   const [nickname, setNickname] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<"male" | "female" | null>(null);
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
 
   // 체크리스트
   const [questions, setQuestions] = useState<ChecklistQuestion[]>([]);
@@ -131,7 +133,13 @@ export default function OnboardingScreen({ onComplete }: Props) {
   // 프로필 완료 → 체크리스트 시작
   const handleProfileDone = () => {
     if (!nickname.trim() || !age || !gender) return;
-    setProfile({ age: parseInt(age), gender, nickname: nickname.trim() });
+    setProfile({
+      age: parseInt(age),
+      gender,
+      nickname: nickname.trim(),
+      height: height ? parseInt(height) : undefined,
+      weight: weight ? parseInt(weight) : undefined,
+    });
     setStep("checklist");
   };
 
@@ -232,6 +240,34 @@ export default function OnboardingScreen({ onComplete }: Props) {
               onChangeText={setAge}
               maxLength={3}
             />
+
+            <View style={styles.bodyRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.inputLabel, { marginTop: 20 }]}>키 (cm)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="예: 165"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="number-pad"
+                  value={height}
+                  onChangeText={setHeight}
+                  maxLength={3}
+                />
+              </View>
+              <View style={{ width: 12 }} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.inputLabel, { marginTop: 20 }]}>몸무게 (kg)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="예: 60"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="number-pad"
+                  value={weight}
+                  onChangeText={setWeight}
+                  maxLength={3}
+                />
+              </View>
+            </View>
 
             <Text style={[styles.inputLabel, { marginTop: 20 }]}>성별</Text>
             <View style={styles.genderRow}>
@@ -419,6 +455,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 5,
+  },
+  bodyRow: {
+    flexDirection: "row",
   },
   inputLabel: {
     fontSize: 14,

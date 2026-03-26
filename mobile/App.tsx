@@ -75,14 +75,10 @@ export default function App() {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const { reset } = useWorkoutStore();
 
-  // 데모 데이터는 체크리스트 완료 후 홈 진입 시에만 적용
+  // 홈 진입 시 데이터 없으면 데모로 폴백
   useEffect(() => {
-    if (screen === "home" && !workoutPlan) {
-      setWorkoutPlan(DEMO_PLAN);
-    }
-    if (screen === "home" && !profile) {
-      setProfile({ age: 30, gender: "female", nickname: "게스트" });
-    }
+    if (screen === "home" && !workoutPlan) setWorkoutPlan(DEMO_PLAN);
+    if (screen === "home" && !profile) setProfile({ age: 30, gender: "female", nickname: "게스트" });
   }, [screen]);
 
   const handleSelectVideo = (videoId: string) => {
