@@ -1,13 +1,12 @@
 /**
  * YouTube 임베드 플레이어 컴포넌트
  *
- * WebView를 사용하여 YouTube 영상을 앱 내에서 재생합니다.
- * YouTube IFrame API를 활용합니다.
+ * 웹: iframe 직접 렌더링
+ * 네이티브(iOS/Android): WebView 사용
  */
 
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
-import { WebView } from "react-native-webview";
+import { View, StyleSheet, Dimensions, Platform } from "react-native";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const PLAYER_HEIGHT = (SCREEN_WIDTH - 32) * (9 / 16); // 16:9 비율
@@ -17,7 +16,31 @@ interface Props {
 }
 
 export default function YouTubePlayer({ videoId }: Props) {
-  // YouTube IFrame embed HTML
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`;
+
+  // 웹 플랫폼: iframe 직접 사용
+  if (Platform.OS === "web") {
+    return (
+      <View style={styles.container}>
+        <iframe
+          src={embedUrl}
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "none",
+            borderRadius: 12,
+          }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title="YouTube Player"
+        />
+      </View>
+    );
+  }
+
+  // 네이티브 플랫폼: WebView 사용
+  const { WebView } = require("react-native-webview");
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -31,7 +54,7 @@ export default function YouTubePlayer({ videoId }: Props) {
     </head>
     <body>
       <iframe
-        src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1"
+        src="${embedUrl}"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen
       ></iframe>
