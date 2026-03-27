@@ -16,7 +16,7 @@ import WorkoutScreen from "./src/screens/WorkoutScreen";
 import VideoPlayerScreen from "./src/screens/VideoPlayerScreen";
 import { useWorkoutStore } from "./src/stores/workoutStore";
 import { useUserStore } from "./src/stores/userStore";
-import type { WorkoutPlan } from "./src/types";
+import type { WorkoutPlan, VideoItem } from "./src/types";
 
 // 데모용 운동 플랜 — 배포 시 홈 화면을 바로 보여주기 위한 샘플 데이터
 const DEMO_PLAN: WorkoutPlan = {
@@ -73,6 +73,9 @@ export default function App() {
     workoutPlan ? "home" : "welcome"
   );
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  // 고민 부위 운동용 임시 영상 & 라벨
+  const [targetVideos, setTargetVideos] = useState<VideoItem[] | null>(null);
+  const [targetAreaLabel, setTargetAreaLabel] = useState<string>("");
   const { reset } = useWorkoutStore();
 
   // 홈 진입 시 데이터 없으면 데모로 폴백
@@ -84,6 +87,13 @@ export default function App() {
   const handleSelectVideo = (videoId: string) => {
     setSelectedVideoId(videoId);
     setScreen("player");
+  };
+
+  // 고민 부위 운동 시작
+  const handleStartTargetWorkout = (videos: VideoItem[], areaLabel: string) => {
+    setTargetVideos(videos);
+    setTargetAreaLabel(areaLabel);
+    setScreen("workout");
   };
 
   const handleRestart = () => {
@@ -105,15 +115,24 @@ export default function App() {
 
       {screen === "home" && (
         <HomeScreen
-          onStartWorkout={() => setScreen("workout")}
+          onStartWorkout={() => {
+            setTargetVideos(null); // FITT 처방 운동은 targetVideos 없이
+            setScreen("workout");
+          }}
           onRestart={handleRestart}
+          onStartTargetWorkout={handleStartTargetWorkout}
         />
       )}
 
       {screen === "workout" && (
         <WorkoutScreen
           onSelectVideo={handleSelectVideo}
-          onBack={() => setScreen("home")}
+          onBack={() => {
+            setTargetVideos(null);
+            setScreen("home");
+          }}
+          targetVideos={targetVideos}
+          targetAreaLabel={targetAreaLabel}
         />
       )}
 

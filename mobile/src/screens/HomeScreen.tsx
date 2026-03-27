@@ -16,6 +16,8 @@ import {
 import { useWorkoutStore } from "../stores/workoutStore";
 import { useUserStore } from "../stores/userStore";
 import { useGoalStore } from "../stores/goalStore";
+import { getBodyAreaVideos, BODY_AREA_LABELS } from "../services/api";
+import type { TargetBodyArea, VideoItem } from "../types";
 
 const COLORS = {
   primary: "#2E75B6",
@@ -134,16 +136,51 @@ function getDetailedPrescription(intensity: string, exerciseType: string, timeMi
   ];
 }
 
+// 고민 부위 목록 (선택 가능한 전체 부위)
+const ALL_BODY_AREAS: TargetBodyArea[] = [
+  "jawline", "arms", "belly", "back", "shoulders", "thighs", "hips", "calves",
+];
+
 interface Props {
   onStartWorkout: () => void;
   onRestart: () => void;
+  onStartTargetWorkout?: (videos: VideoItem[], area: string) => void;
 }
 
-export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
+export default function HomeScreen({ onStartWorkout, onRestart, onStartTargetWorkout }: Props) {
   const { workoutPlan } = useWorkoutStore();
-  const { profile } = useUserStore();
+  const { profile, setProfile } = useUserStore();
   const goal = useGoalStore();
   const [showGoalPicker, setShowGoalPicker] = useState(false);
+  const [selectedAreas, setSelectedAreas] = useState<TargetBodyArea[]>(
+    profile?.targetAreas || []
+  );
+
+  // 고민 부위 토글
+  const toggleBodyArea = (area: TargetBodyArea) => {
+    setSelectedAreas((prev) => {
+      const next = prev.includes(area)
+        ? prev.filter((a) => a !== area)
+        : [...prev, area];
+      // 프로필에 저장
+      if (profile) {
+        setProfile({ ...profile, targetAreas: next });
+      }
+      return next;
+    });
+  };
+
+  // 고민 부위 운동 시작
+  const handleStartTargetWorkout = () => {
+    if (selectedAreas.length === 0) return;
+    const videos = getBodyAreaVideos(selectedAreas);
+    const areaLabel = selectedAreas
+      .map((a) => BODY_AREA_LABELS[a].label)
+      .join("·");
+    if (onStartTargetWorkout) {
+      onStartTargetWorkout(videos, areaLabel);
+    }
+  };
 
   if (!workoutPlan) return null;
 
@@ -383,6 +420,52 @@ export default function HomeScreen({ onStartWorkout, onRestart }: Props) {
         </View>
       )}
 
+      {/* ── 고민 부위 선택 운동 ── */}
+      <View style={styles.targetCard}>
+        <Text style={styles.sectionTitle}>🎯 고민 부위 집중 운동</Text>
+        <Text style={styles.targetDesc}>
+          빼고 싶거나 걱정되는 부위를 선택하면{"\n"}맞춤 영상을 추천해드려요!
+        </Text>
+        <View style={styles.targetGrid}>
+          {ALL_BODY_AREAS.map((area) => {
+            const info = BODY_AREA_LABELS[area];
+            const isSelected = selectedAreas.includes(area);
+            return (
+              <TouchableOpacity
+                key={area}
+                style={[
+                  styles.targetChip,
+                  isSelected && styles.targetChipSelected,
+                ]}
+                onPress={() => toggleBodyArea(area)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.targetChipEmoji}>{info.emoji}</Text>
+                <Text
+                  style={[
+                    styles.targetChipLabel,
+                    isSelected && styles.targetChipLabelSelected,
+                  ]}
+                >
+                  {info.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        {selectedAreas.length > 0 && (
+          <TouchableOpacity
+            style={styles.targetStartBtn}
+            onPress={handleStartTargetWorkout}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.targetStartBtnText}>
+              ▶  {selectedAreas.map((a) => BODY_AREA_LABELS[a].label).join(" + ")} 운동 보기
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {/* 오늘의 운동 프리뷰 */}
       <View style={styles.previewCard}>
         <View style={styles.previewHeader}>
@@ -568,6 +651,45 @@ const styles = StyleSheet.create({
   },
   progressionIcon: { fontSize: 18, marginRight: 10 },
   progressionText: { flex: 1, fontSize: 13, color: COLORS.warning, fontWeight: "600" },
+
+  // ── 고민 부위 ──
+  targetCard: {
+    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
+    borderRadius: 20, padding: 20,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
+  },
+  targetDesc: {
+    fontSize: 13, color: COLORS.textLight, lineHeight: 20, marginBottom: 16,
+  },
+  targetGrid: {
+    flexDirection: "row", flexWrap: "wrap", gap: 10,
+  },
+  targetChip: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: COLORS.bg, borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 10,
+    borderWidth: 1.5, borderColor: "#E5E7EB",
+  },
+  targetChipSelected: {
+    backgroundColor: "#EBF3FB", borderColor: COLORS.primary,
+  },
+  targetChipEmoji: {
+    fontSize: 16, marginRight: 6,
+  },
+  targetChipLabel: {
+    fontSize: 13, fontWeight: "600", color: COLORS.textLight,
+  },
+  targetChipLabelSelected: {
+    color: COLORS.primary, fontWeight: "700",
+  },
+  targetStartBtn: {
+    marginTop: 16, backgroundColor: COLORS.warning,
+    borderRadius: 12, paddingVertical: 14, alignItems: "center",
+    shadowColor: COLORS.warning, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 4,
+  },
+  targetStartBtnText: {
+    color: "#FFF", fontSize: 15, fontWeight: "700",
+  },
 
   // ── 프리뷰 ──
   previewCard: {

@@ -79,7 +79,20 @@ export interface UserProfile {
   height?: number;
   weight?: number;
   nickname?: string;
+  targetAreas?: TargetBodyArea[];
 }
+
+// ── 고민 부위 ──
+
+export type TargetBodyArea =
+  | "jawline"    // 턱선
+  | "arms"       // 팔뚝
+  | "belly"      // 복부
+  | "back"       // 등
+  | "shoulders"  // 어깨
+  | "thighs"     // 허벅지
+  | "hips"       // 엉덩이
+  | "calves";    // 종아리
 
 // ── 운동 목표 트래커 ──
 

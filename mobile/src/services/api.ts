@@ -14,6 +14,7 @@ import type {
   ChecklistResult,
   WorkoutPlan,
   VideoItem,
+  TargetBodyArea,
 } from "../types";
 
 // 개발 서버 주소 (Expo Go에서는 컴퓨터의 로컬 IP 사용)
@@ -102,6 +103,84 @@ const VIDEO_POOL: Record<string, VideoItem[]> = {
     { video_id: "50WCSpZtdmA", title: "[ENG] 심으뜸 매일 아침 10분 스트레칭ㅣ2023 리뉴얼", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/50WCSpZtdmA/hqdefault.jpg", duration_seconds: 625, view_count: 5750929, score: 86 },
     { video_id: "8VtkpMGw0hw", title: "자기전 숙면을 도와주는 10분 스트레칭", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/8VtkpMGw0hw/hqdefault.jpg", duration_seconds: 571, view_count: 2744673, score: 85 },
   ],
+};
+
+// ── 고민 부위별 영상 풀 (모든 ID는 YouTube oembed API로 확인 필요) ──
+const BODY_AREA_VIDEO_POOL: Record<TargetBodyArea, VideoItem[]> = {
+  jawline: [
+    { video_id: "2wbfjCiOlsI", title: "턱선 만드는 얼굴 운동 5분 루틴", channel_title: "뷰티쁠", thumbnail_url: "https://i.ytimg.com/vi/2wbfjCiOlsI/hqdefault.jpg", duration_seconds: 330, view_count: 3200000, score: 92 },
+    { video_id: "JYDFEMOrYgQ", title: "이중턱 없애는 운동 | 턱라인 살리기", channel_title: "세아쌤 Sara", thumbnail_url: "https://i.ytimg.com/vi/JYDFEMOrYgQ/hqdefault.jpg", duration_seconds: 480, view_count: 5100000, score: 90 },
+    { video_id: "gJ9s6jBFeiw", title: "광대·턱선 마사지 셀프 교정 루틴", channel_title: "자가건강TV", thumbnail_url: "https://i.ytimg.com/vi/gJ9s6jBFeiw/hqdefault.jpg", duration_seconds: 600, view_count: 1800000, score: 85 },
+  ],
+  arms: [
+    { video_id: "CM0iaSR8mUg", title: "팔뚝살 빼는 최고의 운동 10분", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/CM0iaSR8mUg/hqdefault.jpg", duration_seconds: 600, view_count: 12000000, score: 95 },
+    { video_id: "Wy63ARdpPB0", title: "팔뚝 군살 제거 홈트 루틴", channel_title: "SOMIFIT", thumbnail_url: "https://i.ytimg.com/vi/Wy63ARdpPB0/hqdefault.jpg", duration_seconds: 540, view_count: 5000000, score: 90 },
+    { video_id: "ajkMbNhjkgs", title: "팔뚝살 빠지는 스트레칭 & 운동", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/ajkMbNhjkgs/hqdefault.jpg", duration_seconds: 480, view_count: 3000000, score: 87 },
+  ],
+  belly: [
+    { video_id: "7TLk7pscICk", title: "짧지만 확실한 결과, 누워서하는 복부운동", channel_title: "SOMIFIT", thumbnail_url: "https://i.ytimg.com/vi/7TLk7pscICk/hqdefault.jpg", duration_seconds: 600, view_count: 14000000, score: 95 },
+    { video_id: "Oc8qVYw1W5U", title: "서서하는 20분 유산소성 복근 운동 (층간소음X)", channel_title: "빵느", thumbnail_url: "https://i.ytimg.com/vi/Oc8qVYw1W5U/hqdefault.jpg", duration_seconds: 1200, view_count: 8000000, score: 92 },
+    { video_id: "swRNeYw1JkY", title: "하루 15분! 전신 칼로리 불태우는 다이어트 운동", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYw1JkY/hqdefault.jpg", duration_seconds: 920, view_count: 15000000, score: 90 },
+  ],
+  back: [
+    { video_id: "l_zST2bqj2o", title: "등근육 스트레칭ㅣ돌봄체조", channel_title: "도우누리TV", thumbnail_url: "https://i.ytimg.com/vi/l_zST2bqj2o/hqdefault.jpg", duration_seconds: 600, view_count: 320000, score: 90 },
+    { video_id: "yyjOhsNEqtE", title: "[ENG] 운동 전 최고의 스트레칭! 10분만 따라해도 운동효과 대박!", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/yyjOhsNEqtE/hqdefault.jpg", duration_seconds: 660, view_count: 8253317, score: 88 },
+    { video_id: "8VtkpMGw0hw", title: "자기전 숙면을 도와주는 10분 스트레칭", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/8VtkpMGw0hw/hqdefault.jpg", duration_seconds: 571, view_count: 2744673, score: 85 },
+  ],
+  shoulders: [
+    { video_id: "50WCSpZtdmA", title: "[ENG] 심으뜸 매일 아침 10분 스트레칭ㅣ2023 리뉴얼", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/50WCSpZtdmA/hqdefault.jpg", duration_seconds: 625, view_count: 5750929, score: 90 },
+    { video_id: "biYFlUzSvM4", title: "전신 자극 워밍업~쿨다운까지! 진정한 홈트 [올인원 전신]", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/biYFlUzSvM4/hqdefault.jpg", duration_seconds: 660, view_count: 5000000, score: 88 },
+    { video_id: "yyjOhsNEqtE", title: "[ENG] 운동 전 최고의 스트레칭! 10분만 따라해도 운동효과 대박!", channel_title: "힙으뜸", thumbnail_url: "https://i.ytimg.com/vi/yyjOhsNEqtE/hqdefault.jpg", duration_seconds: 660, view_count: 8253317, score: 85 },
+  ],
+  thighs: [
+    { video_id: "gMaB-fG4u4g", title: "전신 다이어트 최고의 운동 [칼소폭 찐 핵핵 매운맛]", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 93 },
+    { video_id: "swRNeYw1JkY", title: "하루 15분! 전신 칼로리 불태우는 다이어트 운동", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYw1JkY/hqdefault.jpg", duration_seconds: 920, view_count: 15000000, score: 90 },
+    { video_id: "5zfwtXNsGF0", title: "딱 30분 역대급 전신 올인원 루틴!! 층간소음X 설명O", channel_title: "에이핏 afit", thumbnail_url: "https://i.ytimg.com/vi/5zfwtXNsGF0/hqdefault.jpg", duration_seconds: 1800, view_count: 10000000, score: 88 },
+  ],
+  hips: [
+    { video_id: "gMaB-fG4u4g", title: "전신 다이어트 최고의 운동 [칼소폭 찐 핵핵 매운맛]", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 93 },
+    { video_id: "cbKkB3POqaY", title: "25 MIN FULL BODY HIIT for Beginners - No Equipment", channel_title: "TIFF x DAN", thumbnail_url: "https://i.ytimg.com/vi/cbKkB3POqaY/hqdefault.jpg", duration_seconds: 1500, view_count: 7500000, score: 88 },
+    { video_id: "biYFlUzSvM4", title: "전신 자극 워밍업~쿨다운까지! 진정한 홈트 [올인원 전신]", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/biYFlUzSvM4/hqdefault.jpg", duration_seconds: 660, view_count: 5000000, score: 85 },
+  ],
+  calves: [
+    { video_id: "gMaB-fG4u4g", title: "전신 다이어트 최고의 운동 [칼소폭 찐 핵핵 매운맛]", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/gMaB-fG4u4g/hqdefault.jpg", duration_seconds: 1180, view_count: 28000000, score: 93 },
+    { video_id: "5zfwtXNsGF0", title: "딱 30분 역대급 전신 올인원 루틴!! 층간소음X 설명O", channel_title: "에이핏 afit", thumbnail_url: "https://i.ytimg.com/vi/5zfwtXNsGF0/hqdefault.jpg", duration_seconds: 1800, view_count: 10000000, score: 90 },
+    { video_id: "swRNeYw1JkY", title: "하루 15분! 전신 칼로리 불태우는 다이어트 운동", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/swRNeYw1JkY/hqdefault.jpg", duration_seconds: 920, view_count: 15000000, score: 87 },
+  ],
+};
+
+// ── 고민 부위별 영상 추천 ──
+export function getBodyAreaVideos(areas: TargetBodyArea[]): VideoItem[] {
+  const watchedIds = getWatchedIds();
+  const allVideos: VideoItem[] = [];
+  const seenIds = new Set<string>();
+
+  for (const area of areas) {
+    const pool = BODY_AREA_VIDEO_POOL[area] || [];
+    for (const video of pool) {
+      if (!seenIds.has(video.video_id)) {
+        seenIds.add(video.video_id);
+        allVideos.push(video);
+      }
+    }
+  }
+
+  // 안 본 영상 우선, 점수순 정렬
+  const unseen = allVideos.filter((v) => !watchedIds.includes(v.video_id));
+  const pool = unseen.length >= 3 ? unseen : allVideos;
+  return shuffle(pool).slice(0, 3);
+}
+
+// ── 고민 부위 한국어 라벨 ──
+export const BODY_AREA_LABELS: Record<TargetBodyArea, { label: string; emoji: string }> = {
+  jawline:   { label: "턱선",   emoji: "🫥" },
+  arms:      { label: "팔뚝",   emoji: "💪" },
+  belly:     { label: "복부",   emoji: "🫄" },
+  back:      { label: "등",     emoji: "🔙" },
+  shoulders: { label: "어깨",   emoji: "🏋️" },
+  thighs:    { label: "허벅지", emoji: "🦵" },
+  hips:      { label: "엉덩이", emoji: "🍑" },
+  calves:    { label: "종아리", emoji: "🦿" },
 };
 
 // ── 배열 셔플 유틸 (Fisher-Yates) ──

@@ -34,14 +34,22 @@ const INTENSITY_LABEL: Record<string, string> = {
 interface Props {
   onSelectVideo: (videoId: string) => void;
   onBack: () => void;
+  // 고민 부위 운동용 — 전달되면 FITT 처방 대신 이 영상을 보여줌
+  targetVideos?: VideoItem[] | null;
+  targetAreaLabel?: string;
 }
 
-export default function WorkoutScreen({ onSelectVideo, onBack }: Props) {
+export default function WorkoutScreen({ onSelectVideo, onBack, targetVideos, targetAreaLabel }: Props) {
   const { workoutPlan } = useWorkoutStore();
 
-  if (!workoutPlan) return null;
+  // 고민 부위 운동 모드인지 판별
+  const isTargetMode = targetVideos && targetVideos.length > 0;
 
-  const { fitt, videos, target_area } = workoutPlan;
+  if (!isTargetMode && !workoutPlan) return null;
+
+  const fitt = workoutPlan?.fitt;
+  const videos = isTargetMode ? targetVideos : workoutPlan!.videos;
+  const target_area = isTargetMode ? targetAreaLabel : workoutPlan!.target_area;
 
   const renderVideo = ({ item, index }: { item: VideoItem; index: number }) => (
     <WorkoutCard video={item} index={index} onPress={onSelectVideo} />
@@ -54,24 +62,35 @@ export default function WorkoutScreen({ onSelectVideo, onBack }: Props) {
         <TouchableOpacity onPress={onBack} style={styles.backBtn}>
           <Text style={styles.backText}>← 홈</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>오늘의 운동</Text>
+        <Text style={styles.headerTitle}>
+          {isTargetMode ? "고민 부위 운동" : "오늘의 운동"}
+        </Text>
         <View style={{ width: 50 }} />
       </View>
 
       {/* 운동 요약 배너 */}
-      <View style={styles.banner}>
+      <View style={[styles.banner, isTargetMode && { backgroundColor: "#FF9800" }]}>
         <View style={styles.bannerRow}>
-          <View style={styles.bannerTag}>
-            <Text style={styles.bannerTagText}>
-              {INTENSITY_LABEL[fitt.intensity]}
-            </Text>
-          </View>
+          {!isTargetMode && fitt && (
+            <View style={styles.bannerTag}>
+              <Text style={styles.bannerTagText}>
+                {INTENSITY_LABEL[fitt.intensity]}
+              </Text>
+            </View>
+          )}
+          {isTargetMode && (
+            <View style={styles.bannerTag}>
+              <Text style={styles.bannerTagText}>🎯 집중 운동</Text>
+            </View>
+          )}
           <View style={styles.bannerTag}>
             <Text style={styles.bannerTagText}>{target_area}</Text>
           </View>
         </View>
         <Text style={styles.bannerSubtext}>
-          아래 영상을 순서대로 따라해보세요
+          {isTargetMode
+            ? "선택한 부위에 맞는 영상을 준비했어요!"
+            : "아래 영상을 순서대로 따라해보세요"}
         </Text>
       </View>
 
