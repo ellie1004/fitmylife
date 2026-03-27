@@ -108,14 +108,18 @@ const VIDEO_POOL: Record<string, VideoItem[]> = {
 // ── 고민 부위별 영상 풀 (모든 ID는 YouTube oembed API로 확인 필요) ──
 const BODY_AREA_VIDEO_POOL: Record<TargetBodyArea, VideoItem[]> = {
   jawline: [
-    { video_id: "2wbfjCiOlsI", title: "턱선 만드는 얼굴 운동 5분 루틴", channel_title: "뷰티쁠", thumbnail_url: "https://i.ytimg.com/vi/2wbfjCiOlsI/hqdefault.jpg", duration_seconds: 330, view_count: 3200000, score: 92 },
-    { video_id: "JYDFEMOrYgQ", title: "이중턱 없애는 운동 | 턱라인 살리기", channel_title: "세아쌤 Sara", thumbnail_url: "https://i.ytimg.com/vi/JYDFEMOrYgQ/hqdefault.jpg", duration_seconds: 480, view_count: 5100000, score: 90 },
-    { video_id: "gJ9s6jBFeiw", title: "광대·턱선 마사지 셀프 교정 루틴", channel_title: "자가건강TV", thumbnail_url: "https://i.ytimg.com/vi/gJ9s6jBFeiw/hqdefault.jpg", duration_seconds: 600, view_count: 1800000, score: 85 },
+    { video_id: "BAEG44od0q8", title: "이중턱 없애는 운동! 턱살 빼는 법 얼굴운동", channel_title: "휘연 페이스 필라테스", thumbnail_url: "https://i.ytimg.com/vi/BAEG44od0q8/hqdefault.jpg", duration_seconds: 480, view_count: 3200000, score: 92 },
+    { video_id: "HWhfJW7Wd3o", title: "하루 5분!! 2주만에 이중턱 없애기 운동", channel_title: "PURE.D퓨어디", thumbnail_url: "https://i.ytimg.com/vi/HWhfJW7Wd3o/hqdefault.jpg", duration_seconds: 330, view_count: 5100000, score: 90 },
+    { video_id: "k4ChVjAV2XI", title: "딱 7일! 이중턱 소멸 운동 (브이라인/얼굴작아짐)", channel_title: "이지은 다이어트", thumbnail_url: "https://i.ytimg.com/vi/k4ChVjAV2XI/hqdefault.jpg", duration_seconds: 600, view_count: 1800000, score: 88 },
+    { video_id: "3H-C9hTGVzg", title: "턱선을 날카롭게! 얼굴이 예쁘고 잘생겨지는 운동!", channel_title: "동네 의사 이상욱", thumbnail_url: "https://i.ytimg.com/vi/3H-C9hTGVzg/hqdefault.jpg", duration_seconds: 420, view_count: 2500000, score: 85 },
+    { video_id: "6AfmIJ6P_L4", title: "효과보장! 이중턱 순삭 운동 | 하루 1분 스트레칭", channel_title: "동네 의사 이상욱", thumbnail_url: "https://i.ytimg.com/vi/6AfmIJ6P_L4/hqdefault.jpg", duration_seconds: 360, view_count: 4000000, score: 86 },
   ],
   arms: [
-    { video_id: "CM0iaSR8mUg", title: "팔뚝살 빼는 최고의 운동 10분", channel_title: "Thankyou BUBU", thumbnail_url: "https://i.ytimg.com/vi/CM0iaSR8mUg/hqdefault.jpg", duration_seconds: 600, view_count: 12000000, score: 95 },
-    { video_id: "Wy63ARdpPB0", title: "팔뚝 군살 제거 홈트 루틴", channel_title: "SOMIFIT", thumbnail_url: "https://i.ytimg.com/vi/Wy63ARdpPB0/hqdefault.jpg", duration_seconds: 540, view_count: 5000000, score: 90 },
-    { video_id: "ajkMbNhjkgs", title: "팔뚝살 빠지는 스트레칭 & 운동", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/ajkMbNhjkgs/hqdefault.jpg", duration_seconds: 480, view_count: 3000000, score: 87 },
+    { video_id: "I6N1v1Jqazo", title: "1200만뷰 레전드 팔뚝살 리뉴얼! 상체운동", channel_title: "삐약스핏", thumbnail_url: "https://i.ytimg.com/vi/I6N1v1Jqazo/hqdefault.jpg", duration_seconds: 600, view_count: 12000000, score: 95 },
+    { video_id: "hgqSlNH_NYo", title: "7일후 차이를 느껴보세요! 팔뚝살은 가고 예쁜 라인은 옵니다", channel_title: "SOMIFIT", thumbnail_url: "https://i.ytimg.com/vi/hgqSlNH_NYo/hqdefault.jpg", duration_seconds: 540, view_count: 5000000, score: 92 },
+    { video_id: "-qiWY6d3ncw", title: "팔뚝살, 부유방, 겨살 민소매 라인 만드는 10분 팔운동", channel_title: "빵느", thumbnail_url: "https://i.ytimg.com/vi/-qiWY6d3ncw/hqdefault.jpg", duration_seconds: 600, view_count: 3000000, score: 90 },
+    { video_id: "BHq_5qL5-So", title: "2주만에 팔뚝살 다 태우는 홈트 추천", channel_title: "윤메이MAY", thumbnail_url: "https://i.ytimg.com/vi/BHq_5qL5-So/hqdefault.jpg", duration_seconds: 480, view_count: 4000000, score: 88 },
+    { video_id: "eRpPqnmb0PM", title: "매일 5분만 해서 팔뚝살빼자!! 딱 5분 투자 최대효과", channel_title: "강하나 스트레칭", thumbnail_url: "https://i.ytimg.com/vi/eRpPqnmb0PM/hqdefault.jpg", duration_seconds: 330, view_count: 2000000, score: 87 },
   ],
   belly: [
     { video_id: "7TLk7pscICk", title: "짧지만 확실한 결과, 누워서하는 복부운동", channel_title: "SOMIFIT", thumbnail_url: "https://i.ytimg.com/vi/7TLk7pscICk/hqdefault.jpg", duration_seconds: 600, view_count: 14000000, score: 95 },
