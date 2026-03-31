@@ -1,7 +1,10 @@
 /**
- * 메인 대시보드 스크린
+ * 메인 대시보드 스크린 (Commercial UX Upgrade)
  *
- * FITT-VP 처방 요약, 목표 트래커, 시니어 안내, 오늘의 운동을 보여줍니다.
+ * CLAUDE_PRO_SPEC 기반:
+ * - Deep Navy / Electric Blue / Emerald 컬러 팔레트
+ * - Sticky CTA, Progressive Disclosure, Glassmorphism 카드
+ * - 개인화 요약 최상단 배치, 가독성 높은 그리드 레이아웃
  */
 
 import React, { useState } from "react";
@@ -12,6 +15,7 @@ import {
   ScrollView,
   StyleSheet,
   Linking,
+  Platform,
 } from "react-native";
 import { useWorkoutStore } from "../stores/workoutStore";
 import { useUserStore } from "../stores/userStore";
@@ -19,14 +23,20 @@ import { useGoalStore } from "../stores/goalStore";
 import { getBodyAreaVideos, BODY_AREA_LABELS } from "../services/api";
 import type { TargetBodyArea, VideoItem } from "../types";
 
+// ── 상업용 컬러 팔레트 (CLAUDE_PRO_SPEC §1) ──
 const COLORS = {
-  primary: "#2E75B6",
-  accent: "#4CAF50",
-  warning: "#FF9800",
-  bg: "#F5F7FA",
+  deepNavy: "#0F172A",
+  electricBlue: "#3B82F6",
+  emerald: "#10B981",
+  bg: "#F8FAFC",
   card: "#FFFFFF",
-  text: "#1A1A2E",
-  textLight: "#6B7280",
+  cardGlass: "rgba(255,255,255,0.85)",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  border: "#E2E8F0",
+  warning: "#F59E0B",
+  dangerLight: "#FEF2F2",
 };
 
 const INTENSITY_LABEL: Record<string, string> = {
@@ -124,15 +134,14 @@ function getDetailedPrescription(intensity: string, exerciseType: string, timeMi
       `🎯 ${timeMin}분 동안 약간 숨이 찰 정도의 강도를 유지하세요`,
       `💪 "대화는 가능하지만 노래는 어려운" 정도가 적당합니다`,
       `📅 운동 후 48시간 회복 시간을 두면 근육 성장에 효과적이에요`,
-      `🍌 운동 30분 전 바나나 하나, 운동 후 30분 내 단백질 섭취 추천!`,
+      `🍌 운동 30분 전 바나나 하나, 운동 후에는 탄수화물·단백질이 포함된 균형 잡힌 식사를 해주세요`,
     ];
   }
   return [
     ...common,
     `🎯 ${timeMin}분 고강도 운동 — 심박수 최대의 70~85% 유지`,
-    `🔥 운동 후에도 칼로리가 소모되는 "애프터번 효과"를 노려보세요`,
     `📅 고강도 운동은 연속하지 말고 중간에 저강도 운동으로 교차하세요`,
-    `🥩 근육 회복을 위해 운동 후 단백질 20~30g 섭취 필수!`,
+    `🍚 고강도 운동 후에는 소모된 탄수화물 보충이 중요해요 — 균형 잡힌 식사로 회복하세요`,
   ];
 }
 
@@ -155,6 +164,9 @@ export default function HomeScreen({ onStartWorkout, onRestart, onStartTargetWor
   const [selectedAreas, setSelectedAreas] = useState<TargetBodyArea[]>(
     profile?.targetAreas || []
   );
+  // Progressive Disclosure: 아코디언 상태
+  const [showGuide, setShowGuide] = useState(false);
+  const [showDiet, setShowDiet] = useState(false);
 
   // 고민 부위 토글
   const toggleBodyArea = (area: TargetBodyArea) => {
@@ -162,7 +174,6 @@ export default function HomeScreen({ onStartWorkout, onRestart, onStartTargetWor
       const next = prev.includes(area)
         ? prev.filter((a) => a !== area)
         : [...prev, area];
-      // 프로필에 저장
       if (profile) {
         setProfile({ ...profile, targetAreas: next });
       }
@@ -199,529 +210,763 @@ export default function HomeScreen({ onStartWorkout, onRestart, onStartTargetWor
   const isGoalComplete = goal.completedCount() >= goal.activeGoal;
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* 상단 헤더 */}
-      <View style={styles.header}>
-        <Text style={styles.greeting}>
-          안녕하세요, {profile?.nickname || "회원"}님 👋
-        </Text>
-        <Text style={styles.appName}>FitMyLife</Text>
-      </View>
+    <View style={styles.screen}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Hero 헤더 (§6: 강력한 Copywriting) ── */}
+        <View style={styles.heroSection}>
+          <View style={styles.heroTop}>
+            <View>
+              <Text style={styles.greeting}>
+                안녕하세요, {profile?.nickname || "회원"}님
+              </Text>
+              <Text style={styles.greetingSub}>오늘도 건강한 하루를 시작해볼까요?</Text>
+            </View>
+            <View style={styles.logoBadge}>
+              <Text style={styles.logoText}>FitMyLife</Text>
+            </View>
+          </View>
 
-      {/* 오늘의 메시지 카드 */}
-      <View style={styles.messageCard}>
-        <Text style={styles.messageEmoji}>
-          {fitt.intensity === "low"
-            ? "🌱"
-            : fitt.intensity === "moderate"
-            ? "💪"
-            : "🔥"}
-        </Text>
-        <Text style={styles.messageText}>{message}</Text>
-      </View>
-
-      {/* ── 목표 트래커 카드 ── */}
-      <View style={styles.goalCard}>
-        <View style={styles.goalHeader}>
-          <Text style={styles.sectionTitle}>나의 운동 목표</Text>
-          <TouchableOpacity onPress={() => setShowGoalPicker(!showGoalPicker)}>
-            <Text style={styles.goalChangeBtn}>
-              {goalInfo.emoji} {goalInfo.label} 목표 ▾
+          {/* 개인화 요약 카드 (§6: Dashboard 고도화 — 최상단 배치) */}
+          <View style={styles.heroCard}>
+            <Text style={styles.heroEmoji}>
+              {fitt.intensity === "low" ? "🌱" : fitt.intensity === "moderate" ? "💪" : "🔥"}
             </Text>
-          </TouchableOpacity>
+            <Text style={styles.heroMessage}>{message}</Text>
+          </View>
         </View>
 
-        {/* 목표 선택 드롭다운 */}
-        {showGoalPicker && (
-          <View style={styles.goalPicker}>
-            {GOALS.map((g) => (
+        {/* ── 목표 트래커 카드 ── */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.sectionTitle}>나의 운동 목표</Text>
+            <TouchableOpacity
+              onPress={() => setShowGoalPicker(!showGoalPicker)}
+              style={styles.goalBadge}
+            >
+              <Text style={styles.goalBadgeText}>
+                {goalInfo.emoji} {goalInfo.label} ▾
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* 목표 선택 드롭다운 */}
+          {showGoalPicker && (
+            <View style={styles.goalPicker}>
+              {GOALS.map((g) => (
+                <TouchableOpacity
+                  key={g}
+                  style={[
+                    styles.goalOption,
+                    goal.activeGoal === g && styles.goalOptionActive,
+                  ]}
+                  onPress={() => {
+                    goal.setGoal(g);
+                    setShowGoalPicker(false);
+                  }}
+                >
+                  <Text style={styles.goalOptionEmoji}>{GOAL_LABELS[g].emoji}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[
+                      styles.goalOptionLabel,
+                      goal.activeGoal === g && { color: COLORS.electricBlue },
+                    ]}>
+                      {GOAL_LABELS[g].label}
+                    </Text>
+                    <Text style={styles.goalOptionDesc}>{GOAL_LABELS[g].desc}</Text>
+                  </View>
+                  {goal.activeGoal === g && <Text style={styles.goalCheck}>✓</Text>}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {/* 프로그레스 바 */}
+          <View style={styles.progressBg}>
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  width: `${progressPct}%`,
+                  backgroundColor: isGoalComplete ? COLORS.emerald : COLORS.electricBlue,
+                },
+              ]}
+            />
+          </View>
+
+          {/* 통계 그리드 */}
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{goal.completedCount()}</Text>
+              <Text style={styles.statLabel}>완료일</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>
+                {Math.max(0, goal.activeGoal - goal.completedCount())}
+              </Text>
+              <Text style={styles.statLabel}>남은일</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, streakDays >= 3 && { color: COLORS.warning }]}>
+                {streakDays}일
+              </Text>
+              <Text style={styles.statLabel}>연속</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: COLORS.emerald }]}>
+                {progressPct}%
+              </Text>
+              <Text style={styles.statLabel}>달성률</Text>
+            </View>
+          </View>
+
+          {/* 목표 달성 메시지 */}
+          {isGoalComplete && (
+            <View style={styles.goalCompleteBox}>
+              <Text style={styles.goalCompleteText}>
+                🎉 {goalInfo.label} 목표 달성! 다음 단계에 도전해보세요!
+              </Text>
               <TouchableOpacity
-                key={g}
-                style={[
-                  styles.goalOption,
-                  goal.activeGoal === g && styles.goalOptionActive,
-                ]}
+                style={styles.goalUpgradeBtn}
                 onPress={() => {
-                  goal.setGoal(g);
-                  setShowGoalPicker(false);
+                  const nextGoal = GOALS[GOALS.indexOf(goal.activeGoal) + 1];
+                  if (nextGoal) goal.resetGoal(nextGoal);
                 }}
               >
-                <Text style={styles.goalOptionEmoji}>{GOAL_LABELS[g].emoji}</Text>
+                <Text style={styles.goalUpgradeBtnText}>
+                  {goal.activeGoal === 3
+                    ? "7일 도전 →"
+                    : goal.activeGoal === 7
+                    ? "21일 도전 →"
+                    : goal.activeGoal === 21
+                    ? "100일 도전 →"
+                    : "🏆 마스터 완료!"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {goal.isTodayComplete() && !isGoalComplete && (
+            <Text style={styles.todayDoneText}>✅ 오늘 운동 완료!</Text>
+          )}
+        </View>
+
+        {/* ── 시니어 전용 안내 ── */}
+        {isSenior && (
+          <View style={styles.seniorCard}>
+            <Text style={styles.seniorTitle}>🤝 시니어 맞춤 운동 안내</Text>
+            <Text style={styles.seniorDesc}>
+              안전하고 효과적인 시니어 전용 운동 프로그램을 이용해보세요!
+            </Text>
+            {SENIOR_SITES.map((site) => (
+              <TouchableOpacity
+                key={site.url}
+                style={styles.seniorLink}
+                onPress={() => Linking.openURL(site.url)}
+                activeOpacity={0.7}
+              >
                 <View style={{ flex: 1 }}>
-                  <Text style={[
-                    styles.goalOptionLabel,
-                    goal.activeGoal === g && { color: COLORS.primary },
-                  ]}>
-                    {GOAL_LABELS[g].label}
-                  </Text>
-                  <Text style={styles.goalOptionDesc}>{GOAL_LABELS[g].desc}</Text>
+                  <Text style={styles.seniorLinkTitle}>{site.name}</Text>
+                  <Text style={styles.seniorLinkDesc}>{site.desc}</Text>
                 </View>
-                {goal.activeGoal === g && <Text style={styles.goalCheck}>✓</Text>}
+                <Text style={styles.linkArrow}>→</Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
 
-        {/* 프로그레스 바 */}
-        <View style={styles.goalProgressBg}>
-          <View
-            style={[
-              styles.goalProgressFill,
-              {
-                width: `${progressPct}%`,
-                backgroundColor: isGoalComplete ? "#4CAF50" : COLORS.primary,
-              },
-            ]}
-          />
-        </View>
-
-        <View style={styles.goalStats}>
-          <View style={styles.goalStat}>
-            <Text style={styles.goalStatValue}>{goal.completedCount()}</Text>
-            <Text style={styles.goalStatLabel}>완료일</Text>
-          </View>
-          <View style={styles.goalStatDivider} />
-          <View style={styles.goalStat}>
-            <Text style={styles.goalStatValue}>{goal.activeGoal - goal.completedCount() > 0 ? goal.activeGoal - goal.completedCount() : 0}</Text>
-            <Text style={styles.goalStatLabel}>남은일</Text>
-          </View>
-          <View style={styles.goalStatDivider} />
-          <View style={styles.goalStat}>
-            <Text style={[styles.goalStatValue, streakDays >= 3 && { color: COLORS.warning }]}>
-              {streakDays}일
-            </Text>
-            <Text style={styles.goalStatLabel}>연속</Text>
-          </View>
-          <View style={styles.goalStatDivider} />
-          <View style={styles.goalStat}>
-            <Text style={[styles.goalStatValue, { color: COLORS.accent }]}>
-              {progressPct}%
-            </Text>
-            <Text style={styles.goalStatLabel}>달성률</Text>
-          </View>
-        </View>
-
-        {/* 목표 달성 메시지 */}
-        {isGoalComplete && (
-          <View style={styles.goalCompleteBox}>
-            <Text style={styles.goalCompleteText}>
-              🎉 {goalInfo.label} 목표 달성! 다음 단계에 도전해보세요!
-            </Text>
-            <TouchableOpacity
-              style={styles.goalUpgradeBtn}
-              onPress={() => {
-                const nextGoal = GOALS[GOALS.indexOf(goal.activeGoal) + 1];
-                if (nextGoal) goal.resetGoal(nextGoal);
-              }}
-            >
-              <Text style={styles.goalUpgradeBtnText}>
-                {goal.activeGoal === 3
-                  ? "7일 도전 →"
-                  : goal.activeGoal === 7
-                  ? "21일 도전 →"
-                  : goal.activeGoal === 21
-                  ? "100일 도전 →"
-                  : "🏆 마스터 완료!"}
+        {/* ── FITT 처방 요약 ── */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>나의 운동 처방</Text>
+          <View style={styles.fittGrid}>
+            <View style={styles.fittItem}>
+              <Text style={styles.fittValue}>{fitt.frequency}회</Text>
+              <Text style={styles.fittLabel}>주간 빈도</Text>
+            </View>
+            <View style={styles.fittDivider} />
+            <View style={styles.fittItem}>
+              <Text style={styles.fittValue}>
+                {INTENSITY_LABEL[fitt.intensity] || fitt.intensity}
               </Text>
-            </TouchableOpacity>
+              <Text style={styles.fittLabel}>운동 강도</Text>
+            </View>
+            <View style={styles.fittDivider} />
+            <View style={styles.fittItem}>
+              <Text style={styles.fittValue}>{fitt.time_minutes}분</Text>
+              <Text style={styles.fittLabel}>운동 시간</Text>
+            </View>
+            <View style={styles.fittDivider} />
+            <View style={styles.fittItem}>
+              <Text style={styles.fittValue}>
+                {TYPE_LABEL[fitt.exercise_type] || fitt.exercise_type}
+              </Text>
+              <Text style={styles.fittLabel}>운동 유형</Text>
+            </View>
           </View>
-        )}
+          <View style={styles.progressionBox}>
+            <Text style={styles.progressionIcon}>📈</Text>
+            <Text style={styles.progressionText}>{fitt.progression}</Text>
+          </View>
+        </View>
 
-        {/* 오늘 운동 완료 여부 */}
-        {goal.isTodayComplete() && !isGoalComplete && (
-          <Text style={styles.todayDoneText}>✅ 오늘 운동 완료!</Text>
-        )}
-      </View>
+        {/* ── 상세 운동 가이드 (Progressive Disclosure — 아코디언) ── */}
+        <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.accordionHeader}
+            onPress={() => setShowGuide(!showGuide)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sectionTitle}>📋 운동 가이드</Text>
+            <Text style={styles.accordionArrow}>{showGuide ? "▲" : "▼"}</Text>
+          </TouchableOpacity>
+          {showGuide &&
+            getDetailedPrescription(fitt.intensity, fitt.exercise_type, fitt.time_minutes).map((tip, i) => (
+              <Text key={i} style={styles.tipText}>{tip}</Text>
+            ))
+          }
+          {!showGuide && (
+            <Text style={styles.accordionHint}>탭하여 상세 가이드 보기</Text>
+          )}
+        </View>
 
-      {/* ── 시니어 전용 안내 ── */}
-      {isSenior && (
-        <View style={styles.seniorCard}>
-          <Text style={styles.seniorTitle}>🤝 시니어 맞춤 운동 안내</Text>
-          <Text style={styles.seniorDesc}>
-            안전하고 효과적인 시니어 전용 운동 프로그램을 이용해보세요!
-          </Text>
-          {SENIOR_SITES.map((site) => (
+        {/* ── 맞춤 식단 가이드 (Progressive Disclosure — 아코디언) ── */}
+        {profile && (
+          <View style={styles.dietCard}>
             <TouchableOpacity
-              key={site.url}
-              style={styles.seniorLink}
-              onPress={() => Linking.openURL(site.url)}
+              style={styles.accordionHeader}
+              onPress={() => setShowDiet(!showDiet)}
               activeOpacity={0.7}
             >
-              <View style={{ flex: 1 }}>
-                <Text style={styles.seniorLinkTitle}>{site.name}</Text>
-                <Text style={styles.seniorLinkDesc}>{site.desc}</Text>
-              </View>
-              <Text style={styles.seniorArrow}>→</Text>
+              <Text style={styles.sectionTitle}>
+                🍽️ {getDietTips(profile.age, profile.gender).title}
+              </Text>
+              <Text style={styles.accordionArrow}>{showDiet ? "▲" : "▼"}</Text>
             </TouchableOpacity>
-          ))}
-        </View>
-      )}
 
-      {/* FITT 처방 요약 */}
-      <View style={styles.fittCard}>
-        <Text style={styles.sectionTitle}>나의 운동 처방</Text>
-        <View style={styles.fittGrid}>
-          <View style={styles.fittItem}>
-            <Text style={styles.fittValue}>{fitt.frequency}회</Text>
-            <Text style={styles.fittLabel}>주간 빈도</Text>
-          </View>
-          <View style={styles.fittDivider} />
-          <View style={styles.fittItem}>
-            <Text style={styles.fittValue}>
-              {INTENSITY_LABEL[fitt.intensity] || fitt.intensity}
-            </Text>
-            <Text style={styles.fittLabel}>운동 강도</Text>
-          </View>
-          <View style={styles.fittDivider} />
-          <View style={styles.fittItem}>
-            <Text style={styles.fittValue}>{fitt.time_minutes}분</Text>
-            <Text style={styles.fittLabel}>운동 시간</Text>
-          </View>
-          <View style={styles.fittDivider} />
-          <View style={styles.fittItem}>
-            <Text style={styles.fittValue}>
-              {TYPE_LABEL[fitt.exercise_type] || fitt.exercise_type}
-            </Text>
-            <Text style={styles.fittLabel}>운동 유형</Text>
-          </View>
-        </View>
-        <View style={styles.progressionBox}>
-          <Text style={styles.progressionIcon}>📈</Text>
-          <Text style={styles.progressionText}>{fitt.progression}</Text>
-        </View>
-      </View>
+            {/* 칼로리는 항상 표시 (핵심 정보) */}
+            <View style={styles.calorieBox}>
+              <Text style={styles.calorieLabel}>일일 권장 칼로리</Text>
+              <Text style={styles.calorieValue}>
+                {getDietTips(profile.age, profile.gender).calories}
+              </Text>
+            </View>
 
-      {/* ── 상세 운동 가이드 ── */}
-      <View style={styles.detailCard}>
-        <Text style={styles.sectionTitle}>📋 운동 가이드</Text>
-        {getDetailedPrescription(fitt.intensity, fitt.exercise_type, fitt.time_minutes).map((tip, i) => (
-          <Text key={i} style={styles.detailTip}>{tip}</Text>
-        ))}
-      </View>
-
-      {/* ── 맞춤 식단 가이드 ── */}
-      {profile && (
-        <View style={styles.dietCard}>
-          <Text style={styles.sectionTitle}>
-            🍽️ {getDietTips(profile.age, profile.gender).title}
-          </Text>
-          <View style={styles.dietCalorieBox}>
-            <Text style={styles.dietCalorieLabel}>일일 권장 칼로리</Text>
-            <Text style={styles.dietCalorieValue}>
-              {getDietTips(profile.age, profile.gender).calories}
-            </Text>
-          </View>
-          {getDietTips(profile.age, profile.gender).tips.map((tip, i) => (
-            <Text key={i} style={styles.dietTip}>{tip}</Text>
-          ))}
-          <Text style={styles.dietDisclaimer}>
-            * 일반적인 건강 정보이며 의학적 조언이 아닙니다
-          </Text>
-        </View>
-      )}
-
-      {/* ── 고민 부위 선택 운동 ── */}
-      <View style={styles.targetCard}>
-        <Text style={styles.sectionTitle}>🎯 고민 부위 집중 운동</Text>
-        <Text style={styles.targetDesc}>
-          빼고 싶거나 걱정되는 부위를 선택하면{"\n"}맞춤 영상을 추천해드려요!
-        </Text>
-        <View style={styles.targetGrid}>
-          {ALL_BODY_AREAS.map((area) => {
-            const info = BODY_AREA_LABELS[area];
-            const isSelected = selectedAreas.includes(area);
-            return (
-              <TouchableOpacity
-                key={area}
-                style={[
-                  styles.targetChip,
-                  isSelected && styles.targetChipSelected,
-                ]}
-                onPress={() => toggleBodyArea(area)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.targetChipEmoji}>{info.emoji}</Text>
-                <Text
-                  style={[
-                    styles.targetChipLabel,
-                    isSelected && styles.targetChipLabelSelected,
-                  ]}
-                >
-                  {info.label}
+            {showDiet && (
+              <>
+                {getDietTips(profile.age, profile.gender).tips.map((tip, i) => (
+                  <Text key={i} style={styles.tipText}>{tip}</Text>
+                ))}
+                <Text style={styles.disclaimer}>
+                  * 일반적인 건강 정보이며 의학적 조언이 아닙니다
                 </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-        {selectedAreas.length > 0 && (
-          <TouchableOpacity
-            style={styles.targetStartBtn}
-            onPress={handleStartTargetWorkout}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.targetStartBtnText}>
-              ▶  {selectedAreas.map((a) => BODY_AREA_LABELS[a].label).join(" + ")} 운동 보기
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* 오늘의 운동 프리뷰 */}
-      <View style={styles.previewCard}>
-        <View style={styles.previewHeader}>
-          <Text style={styles.sectionTitle}>오늘의 운동</Text>
-          <View style={styles.videoBadge}>
-            <Text style={styles.videoBadgeText}>
-              {videos.length}개 영상 준비됨
-            </Text>
+              </>
+            )}
+            {!showDiet && (
+              <Text style={styles.accordionHint}>탭하여 상세 식단 보기</Text>
+            )}
           </View>
+        )}
+
+        {/* ── 고민 부위 선택 운동 ── */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>🎯 고민 부위 집중 운동</Text>
+          <Text style={styles.subtitleText}>
+            빼고 싶거나 걱정되는 부위를 선택하면{"\n"}맞춤 영상을 추천해드려요!
+          </Text>
+          <View style={styles.chipGrid}>
+            {ALL_BODY_AREAS.map((area) => {
+              const info = BODY_AREA_LABELS[area];
+              const isSelected = selectedAreas.includes(area);
+              return (
+                <TouchableOpacity
+                  key={area}
+                  style={[styles.chip, isSelected && styles.chipSelected]}
+                  onPress={() => toggleBodyArea(area)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.chipEmoji}>{info.emoji}</Text>
+                  <Text style={[styles.chipLabel, isSelected && styles.chipLabelSelected]}>
+                    {info.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          {selectedAreas.length > 0 && (
+            <TouchableOpacity
+              style={styles.targetStartBtn}
+              onPress={handleStartTargetWorkout}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.targetStartBtnText}>
+                ▶  {selectedAreas.map((a) => BODY_AREA_LABELS[a].label).join(" + ")} 운동 보기
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-        <Text style={styles.previewQuery}>
-          🔍 "{workoutPlan.search_query}"
-        </Text>
-        <Text style={styles.previewTarget}>
-          타겟: {workoutPlan.target_area}
-        </Text>
-      </View>
 
-      {/* CTA 버튼 */}
-      <TouchableOpacity style={styles.startButton} onPress={handleStartWorkout}>
-        <Text style={styles.startButtonText}>
-          {goal.isTodayComplete() ? "▶  운동 다시 보기" : "▶  오늘의 운동 시작하기"}
-        </Text>
-      </TouchableOpacity>
-
-      {/* 온라인 스포츠 센터 참고 링크 */}
-      <TouchableOpacity
-        style={styles.refCard}
-        onPress={() =>
-          Linking.openURL("https://www.ksponco.or.kr/onlinesports/")
-        }
-        activeOpacity={0.7}
-      >
-        <Text style={styles.refIcon}>🏅</Text>
-        <View style={styles.refTextWrap}>
-          <Text style={styles.refTitle}>국민체육진흥공단 온라인 스포츠센터</Text>
-          <Text style={styles.refDesc}>
-            더 다양한 운동 콘텐츠가 궁금하다면 참고해보세요!
+        {/* ── 오늘의 운동 프리뷰 ── */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.sectionTitle}>오늘의 운동</Text>
+            <View style={styles.videoBadge}>
+              <Text style={styles.videoBadgeText}>
+                {videos.length}개 영상 준비됨
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.previewQuery}>
+            🔍 "{workoutPlan.search_query}"
+          </Text>
+          <Text style={styles.previewTarget}>
+            타겟: {workoutPlan.target_area}
           </Text>
         </View>
-        <Text style={styles.refArrow}>→</Text>
-      </TouchableOpacity>
 
-      {/* 다시 진단하기 */}
-      <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
-        <Text style={styles.restartText}>체크리스트 다시하기</Text>
-      </TouchableOpacity>
-
-      {/* 하단 크레딧 */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Designed by </Text>
+        {/* 온라인 스포츠 센터 참고 링크 */}
         <TouchableOpacity
-          onPress={() => Linking.openURL("https://nugunaai.com/")}
+          style={styles.refCard}
+          onPress={() => Linking.openURL("https://www.ksponco.or.kr/onlinesports/")}
+          activeOpacity={0.7}
         >
-          <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
+          <Text style={styles.refIcon}>🏅</Text>
+          <View style={styles.refTextWrap}>
+            <Text style={styles.refTitle}>국민체육진흥공단 온라인 스포츠센터</Text>
+            <Text style={styles.refDesc}>
+              더 다양한 운동 콘텐츠가 궁금하다면 참고해보세요!
+            </Text>
+          </View>
+          <Text style={styles.linkArrow}>→</Text>
+        </TouchableOpacity>
+
+        {/* 다시 진단하기 */}
+        <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
+          <Text style={styles.restartText}>체크리스트 다시하기</Text>
+        </TouchableOpacity>
+
+        {/* 하단 크레딧 */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Designed by </Text>
+          <TouchableOpacity onPress={() => Linking.openURL("https://nugunaai.com/")}>
+            <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sticky CTA 높이만큼 하단 여백 */}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {/* ── Sticky CTA (§3: 스크롤 시에도 화면 하단 고정) ── */}
+      <View style={styles.stickyCta}>
+        <TouchableOpacity style={styles.ctaButton} onPress={handleStartWorkout} activeOpacity={0.85}>
+          <Text style={styles.ctaButtonText}>
+            {goal.isTodayComplete() ? "▶  운동 다시 보기" : "▶  오늘의 운동 시작하기"}
+          </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
+// ── 스타일 (§1 디자인 시스템 반영) ──
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.bg },
-  content: { paddingBottom: 40 },
-  header: {
-    paddingHorizontal: 20, paddingTop: 64, paddingBottom: 8,
-    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+  scrollView: { flex: 1 },
+  content: { paddingBottom: 0 },
+
+  // ── Hero 섹션 ──
+  heroSection: {
+    backgroundColor: COLORS.deepNavy,
+    paddingHorizontal: 20,
+    paddingTop: 64,
+    paddingBottom: 28,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
-  greeting: { fontSize: 16, color: COLORS.text, fontWeight: "500" },
-  appName: { fontSize: 18, fontWeight: "900", color: COLORS.primary, letterSpacing: -0.3 },
-  messageCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.primary,
-    borderRadius: 20, padding: 24, flexDirection: "row", alignItems: "center",
+  heroTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 20,
   },
-  messageEmoji: { fontSize: 36, marginRight: 16 },
-  messageText: { flex: 1, fontSize: 17, fontWeight: "600", color: "#FFF", lineHeight: 26 },
-  sectionTitle: { fontSize: 16, fontWeight: "700", color: COLORS.text, marginBottom: 16 },
+  greeting: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    letterSpacing: -0.3,
+  },
+  greetingSub: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginTop: 4,
+  },
+  logoBadge: {
+    backgroundColor: "rgba(59,130,246,0.15)",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  logoText: {
+    fontSize: 15,
+    fontWeight: "900",
+    color: COLORS.electricBlue,
+    letterSpacing: -0.5,
+  },
+  heroCard: {
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+  },
+  heroEmoji: { fontSize: 36, marginRight: 16 },
+  heroMessage: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    lineHeight: 24,
+  },
+
+  // ── 공통 카드 (Glassmorphism 느낌) ──
+  card: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: COLORS.cardGlass,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: "#0F172A", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12 },
+      android: { elevation: 4 },
+    }),
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: COLORS.deepNavy,
+    letterSpacing: -0.3,
+  },
 
   // ── 목표 트래커 ──
-  goalCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
-    borderRadius: 20, padding: 20,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
+  goalBadge: {
+    backgroundColor: "rgba(59,130,246,0.1)",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  goalHeader: {
-    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-  },
-  goalChangeBtn: {
-    fontSize: 13, fontWeight: "700", color: COLORS.primary,
-    backgroundColor: "#EBF3FB", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5,
+  goalBadgeText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: COLORS.electricBlue,
   },
   goalPicker: {
-    marginTop: 12, borderRadius: 12, backgroundColor: COLORS.bg, padding: 8,
+    marginTop: 12,
+    borderRadius: 12,
+    backgroundColor: COLORS.bg,
+    padding: 8,
   },
   goalOption: {
-    flexDirection: "row", alignItems: "center", padding: 12, borderRadius: 10, marginBottom: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 4,
   },
-  goalOptionActive: { backgroundColor: "#EBF3FB" },
+  goalOptionActive: { backgroundColor: "rgba(59,130,246,0.08)" },
   goalOptionEmoji: { fontSize: 20, marginRight: 12 },
   goalOptionLabel: { fontSize: 14, fontWeight: "700", color: COLORS.text },
-  goalOptionDesc: { fontSize: 11, color: COLORS.textLight, marginTop: 2 },
-  goalCheck: { fontSize: 16, fontWeight: "700", color: COLORS.primary },
-  goalProgressBg: {
-    height: 8, backgroundColor: "#E5E7EB", borderRadius: 4, marginTop: 16, overflow: "hidden",
+  goalOptionDesc: { fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
+  goalCheck: { fontSize: 16, fontWeight: "700", color: COLORS.electricBlue },
+  progressBg: {
+    height: 8,
+    backgroundColor: COLORS.border,
+    borderRadius: 4,
+    marginTop: 16,
+    overflow: "hidden",
   },
-  goalProgressFill: { height: "100%", borderRadius: 4 },
-  goalStats: {
-    flexDirection: "row", justifyContent: "space-around", marginTop: 16,
+  progressFill: { height: "100%", borderRadius: 4 },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 16,
   },
-  goalStat: { alignItems: "center", flex: 1 },
-  goalStatValue: { fontSize: 18, fontWeight: "800", color: COLORS.primary },
-  goalStatLabel: { fontSize: 11, color: COLORS.textLight, fontWeight: "500", marginTop: 2 },
-  goalStatDivider: { width: 1, height: 30, backgroundColor: "#E5E7EB" },
+  statItem: { alignItems: "center", flex: 1 },
+  statValue: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: COLORS.electricBlue,
+  },
+  statLabel: {
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    fontWeight: "500",
+    marginTop: 2,
+  },
+  statDivider: { width: 1, height: 30, backgroundColor: COLORS.border },
   goalCompleteBox: {
-    marginTop: 16, backgroundColor: "#ECFDF5", borderRadius: 12, padding: 14, alignItems: "center",
+    marginTop: 16,
+    backgroundColor: "rgba(16,185,129,0.08)",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
   },
-  goalCompleteText: { fontSize: 14, fontWeight: "700", color: COLORS.accent, textAlign: "center" },
+  goalCompleteText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: COLORS.emerald,
+    textAlign: "center",
+  },
   goalUpgradeBtn: {
-    marginTop: 10, backgroundColor: COLORS.accent, borderRadius: 8,
-    paddingHorizontal: 16, paddingVertical: 8,
+    marginTop: 10,
+    backgroundColor: COLORS.emerald,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   goalUpgradeBtnText: { color: "#FFF", fontSize: 13, fontWeight: "700" },
   todayDoneText: {
-    textAlign: "center", marginTop: 12, fontSize: 14, fontWeight: "700", color: COLORS.accent,
+    textAlign: "center",
+    marginTop: 12,
+    fontSize: 14,
+    fontWeight: "700",
+    color: COLORS.emerald,
   },
 
   // ── 시니어 안내 ──
   seniorCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: "#FFF7ED",
-    borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#FDE68A",
+    marginHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: "#FFFBEB",
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
   },
   seniorTitle: { fontSize: 16, fontWeight: "700", color: COLORS.text, marginBottom: 8 },
-  seniorDesc: { fontSize: 13, color: COLORS.textLight, lineHeight: 20, marginBottom: 12 },
+  seniorDesc: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 20, marginBottom: 12 },
   seniorLink: {
-    flexDirection: "row", alignItems: "center", backgroundColor: COLORS.card,
-    borderRadius: 12, padding: 14, marginBottom: 8,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  seniorLinkTitle: { fontSize: 14, fontWeight: "700", color: COLORS.primary },
-  seniorLinkDesc: { fontSize: 11, color: COLORS.textLight, marginTop: 2 },
-  seniorArrow: { fontSize: 18, color: COLORS.warning, fontWeight: "700", marginLeft: 8 },
+  seniorLinkTitle: { fontSize: 14, fontWeight: "700", color: COLORS.electricBlue },
+  seniorLinkDesc: { fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
+  linkArrow: { fontSize: 18, color: COLORS.warning, fontWeight: "700", marginLeft: 8 },
 
   // ── FITT ──
-  fittCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
-    borderRadius: 20, padding: 20,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
-  },
-  // ── 상세 운동 가이드 ──
-  detailCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
-    borderRadius: 20, padding: 20,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
-  },
-  detailTip: {
-    fontSize: 13, color: COLORS.text, lineHeight: 22, marginBottom: 8, paddingLeft: 4,
-  },
-  // ── 식단 가이드 ──
-  dietCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: "#F0FFF4",
-    borderRadius: 20, padding: 20, borderWidth: 1, borderColor: "#C6F6D5",
-  },
-  dietCalorieBox: {
-    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    backgroundColor: COLORS.card, borderRadius: 12, padding: 14, marginBottom: 16,
-  },
-  dietCalorieLabel: { fontSize: 13, fontWeight: "600", color: COLORS.textLight },
-  dietCalorieValue: { fontSize: 16, fontWeight: "800", color: COLORS.accent },
-  dietTip: {
-    fontSize: 13, color: COLORS.text, lineHeight: 22, marginBottom: 8, paddingLeft: 4,
-  },
-  dietDisclaimer: {
-    fontSize: 10, color: "#9CA3AF", textAlign: "center", marginTop: 8, fontStyle: "italic",
-  },
   fittGrid: { flexDirection: "row", justifyContent: "space-around", alignItems: "center" },
   fittItem: { alignItems: "center", flex: 1 },
-  fittValue: { fontSize: 15, fontWeight: "800", color: COLORS.primary, marginBottom: 4, textAlign: "center" },
-  fittLabel: { fontSize: 11, color: COLORS.textLight, fontWeight: "500" },
-  fittDivider: { width: 1, height: 36, backgroundColor: "#E5E7EB" },
+  fittValue: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: COLORS.electricBlue,
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  fittLabel: { fontSize: 11, color: COLORS.textSecondary, fontWeight: "500" },
+  fittDivider: { width: 1, height: 36, backgroundColor: COLORS.border },
   progressionBox: {
-    flexDirection: "row", alignItems: "center", backgroundColor: "#FFF7ED",
-    borderRadius: 12, padding: 12, marginTop: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(245,158,11,0.08)",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
   },
   progressionIcon: { fontSize: 18, marginRight: 10 },
   progressionText: { flex: 1, fontSize: 13, color: COLORS.warning, fontWeight: "600" },
 
+  // ── 아코디언 (Progressive Disclosure §2) ──
+  accordionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  accordionArrow: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontWeight: "600",
+  },
+  accordionHint: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    marginTop: 8,
+    textAlign: "center",
+  },
+  tipText: {
+    fontSize: 13,
+    color: COLORS.text,
+    lineHeight: 22,
+    marginBottom: 8,
+    marginTop: 4,
+    paddingLeft: 4,
+  },
+
+  // ── 식단 가이드 ──
+  dietCard: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: "rgba(16,185,129,0.05)",
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(16,185,129,0.2)",
+  },
+  calorieBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 12,
+  },
+  calorieLabel: { fontSize: 13, fontWeight: "600", color: COLORS.textSecondary },
+  calorieValue: { fontSize: 16, fontWeight: "800", color: COLORS.emerald },
+  disclaimer: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    textAlign: "center",
+    marginTop: 8,
+    fontStyle: "italic",
+  },
+
   // ── 고민 부위 ──
-  targetCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
-    borderRadius: 20, padding: 20,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
+  subtitleText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+    marginBottom: 16,
+    marginTop: 4,
   },
-  targetDesc: {
-    fontSize: 13, color: COLORS.textLight, lineHeight: 20, marginBottom: 16,
+  chipGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
   },
-  targetGrid: {
-    flexDirection: "row", flexWrap: "wrap", gap: 10,
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.bg,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
   },
-  targetChip: {
-    flexDirection: "row", alignItems: "center",
-    backgroundColor: COLORS.bg, borderRadius: 12,
-    paddingHorizontal: 14, paddingVertical: 10,
-    borderWidth: 1.5, borderColor: "#E5E7EB",
+  chipSelected: {
+    backgroundColor: "rgba(59,130,246,0.08)",
+    borderColor: COLORS.electricBlue,
   },
-  targetChipSelected: {
-    backgroundColor: "#EBF3FB", borderColor: COLORS.primary,
-  },
-  targetChipEmoji: {
-    fontSize: 16, marginRight: 6,
-  },
-  targetChipLabel: {
-    fontSize: 13, fontWeight: "600", color: COLORS.textLight,
-  },
-  targetChipLabelSelected: {
-    color: COLORS.primary, fontWeight: "700",
-  },
+  chipEmoji: { fontSize: 16, marginRight: 6 },
+  chipLabel: { fontSize: 13, fontWeight: "600", color: COLORS.textSecondary },
+  chipLabelSelected: { color: COLORS.electricBlue, fontWeight: "700" },
   targetStartBtn: {
-    marginTop: 16, backgroundColor: COLORS.warning,
-    borderRadius: 12, paddingVertical: 14, alignItems: "center",
-    shadowColor: COLORS.warning, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 4,
+    marginTop: 16,
+    backgroundColor: COLORS.warning,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    ...Platform.select({
+      ios: { shadowColor: COLORS.warning, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6 },
+      android: { elevation: 4 },
+    }),
   },
-  targetStartBtnText: {
-    color: "#FFF", fontSize: 15, fontWeight: "700",
-  },
+  targetStartBtnText: { color: "#FFF", fontSize: 15, fontWeight: "700" },
 
   // ── 프리뷰 ──
-  previewCard: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: COLORS.card,
-    borderRadius: 20, padding: 20,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
+  videoBadge: {
+    backgroundColor: "rgba(16,185,129,0.1)",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
-  previewHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
-  videoBadge: { backgroundColor: "#ECFDF5", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  videoBadgeText: { fontSize: 12, fontWeight: "600", color: COLORS.accent },
-  previewQuery: { fontSize: 14, color: COLORS.textLight, marginBottom: 4 },
-  previewTarget: { fontSize: 13, color: COLORS.textLight },
+  videoBadgeText: { fontSize: 12, fontWeight: "600", color: COLORS.emerald },
+  previewQuery: { fontSize: 14, color: COLORS.textSecondary, marginTop: 8, marginBottom: 4 },
+  previewTarget: { fontSize: 13, color: COLORS.textSecondary },
 
-  // ── 버튼 ──
-  startButton: {
-    marginHorizontal: 16, marginTop: 24, backgroundColor: COLORS.accent,
-    borderRadius: 16, paddingVertical: 18, alignItems: "center",
-    shadowColor: COLORS.accent, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5,
-  },
-  startButtonText: { color: "#FFF", fontSize: 17, fontWeight: "700" },
+  // ── 참고 링크 ──
   refCard: {
-    flexDirection: "row", alignItems: "center", marginHorizontal: 16, marginTop: 20,
-    backgroundColor: "#FFFBEB", borderRadius: 16, padding: 16, borderWidth: 1, borderColor: "#FDE68A",
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginTop: 20,
+    backgroundColor: "#FFFBEB",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
   },
   refIcon: { fontSize: 24, marginRight: 12 },
   refTextWrap: { flex: 1 },
   refTitle: { fontSize: 13, fontWeight: "700", color: COLORS.text, marginBottom: 2 },
-  refDesc: { fontSize: 11, color: COLORS.textLight, lineHeight: 16 },
-  refArrow: { fontSize: 18, color: COLORS.warning, fontWeight: "700", marginLeft: 8 },
+  refDesc: { fontSize: 11, color: COLORS.textSecondary, lineHeight: 16 },
+
+  // ── 하단 ──
   restartButton: { alignItems: "center", marginTop: 16, paddingVertical: 8 },
-  restartText: { fontSize: 14, color: COLORS.textLight, textDecorationLine: "underline" },
-  footer: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 24, paddingBottom: 8 },
-  footerText: { fontSize: 11, color: "#9CA3AF" },
-  footerLink: { fontSize: 11, fontWeight: "700", color: COLORS.accent, textDecorationLine: "underline" },
+  restartText: { fontSize: 14, color: COLORS.textSecondary, textDecorationLine: "underline" },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 24,
+    paddingBottom: 8,
+  },
+  footerText: { fontSize: 11, color: COLORS.textMuted },
+  footerLink: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: COLORS.emerald,
+    textDecorationLine: "underline",
+  },
+
+  // ── Sticky CTA (§3: Conversion Rate Optimization) ──
+  stickyCta: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === "ios" ? 34 : 16,
+    backgroundColor: "rgba(248,250,252,0.95)",
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  ctaButton: {
+    backgroundColor: COLORS.electricBlue,
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: "center",
+    ...Platform.select({
+      ios: { shadowColor: COLORS.electricBlue, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 12 },
+      android: { elevation: 8 },
+    }),
+  },
+  ctaButtonText: {
+    color: "#FFF",
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: -0.3,
+  },
 });
