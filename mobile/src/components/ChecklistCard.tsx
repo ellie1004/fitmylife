@@ -1,26 +1,26 @@
 /**
- * 체크리스트 진단 질문 카드 컴포넌트
+ * 체크리스트 진단 질문 카드 컴포넌트 (Commercial UX)
  *
- * 한 번에 하나의 질문을 카드 형태로 보여주고
- * 5점 리커트 척도 버튼으로 답변을 받습니다.
- * 카테고리별 운동 관련 아이콘 장식 포함.
+ * CLAUDE_PRO_SPEC 기반:
+ * - Deep Navy / Electric Blue / Emerald 컬러 통일
+ * - 프리미엄 카드 + Glassmorphism 느낌
+ * - 카테고리별 컬러 시스템 유지 (시각적 구분)
  */
 
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import type { ChecklistQuestion } from "../types";
 
-// 메인 컬러 팔레트 (CLAUDE.md 기준)
 const COLORS = {
-  primary: "#2E75B6",
-  accent: "#4CAF50",
-  warning: "#FF9800",
-  bg: "#F5F7FA",
+  deepNavy: "#0F172A",
+  electricBlue: "#3B82F6",
+  emerald: "#10B981",
+  bg: "#F8FAFC",
   card: "#FFFFFF",
-  text: "#1A1A2E",
-  textLight: "#6B7280",
-  selected: "#2E75B6",
-  selectedText: "#FFFFFF",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  border: "#E2E8F0",
 };
 
 // 카테고리별 아이콘과 액센트 컬러
@@ -28,12 +28,12 @@ const CATEGORY_STYLE: Record<
   string,
   { emoji: string; label: string; color: string }
 > = {
-  physical_activity: { emoji: "🏃‍♂️", label: "신체활동", color: "#2E75B6" },
-  diet: { emoji: "🥗", label: "식습관", color: "#4CAF50" },
+  physical_activity: { emoji: "🏃‍♂️", label: "신체활동", color: "#3B82F6" },
+  diet: { emoji: "🥗", label: "식습관", color: "#10B981" },
   sleep: { emoji: "🌙", label: "수면", color: "#7C3AED" },
   stress: { emoji: "🧘‍♀️", label: "스트레스", color: "#F59E0B" },
   health_status: { emoji: "❤️", label: "건강상태", color: "#EF4444" },
-  exercise_experience: { emoji: "💪", label: "운동경험", color: "#FF9800" },
+  exercise_experience: { emoji: "💪", label: "운동경험", color: "#F97316" },
 };
 
 interface Props {
@@ -54,7 +54,7 @@ export default function ChecklistCard({
   const catStyle = CATEGORY_STYLE[question.category] || {
     emoji: "📋",
     label: question.category,
-    color: COLORS.primary,
+    color: COLORS.electricBlue,
   };
 
   const progress = ((currentIndex + 1) / totalCount) * 100;
@@ -63,9 +63,7 @@ export default function ChecklistCard({
     <View style={styles.container}>
       {/* 카테고리 배지 + 진행 카운터 */}
       <View style={styles.progressRow}>
-        <View
-          style={[styles.categoryBadge, { backgroundColor: catStyle.color + "15" }]}
-        >
+        <View style={[styles.categoryBadge, { backgroundColor: catStyle.color + "12" }]}>
           <Text style={styles.categoryEmoji}>{catStyle.emoji}</Text>
           <Text style={[styles.categoryLabel, { color: catStyle.color }]}>
             {catStyle.label}
@@ -81,10 +79,7 @@ export default function ChecklistCard({
         <View
           style={[
             styles.progressBarFill,
-            {
-              width: `${progress}%`,
-              backgroundColor: catStyle.color,
-            },
+            { width: `${progress}%`, backgroundColor: catStyle.color },
           ]}
         />
       </View>
@@ -95,7 +90,7 @@ export default function ChecklistCard({
       {/* 선택지 버튼 */}
       <View style={styles.optionsContainer}>
         {question.options.map((option, index) => {
-          const value = index + 1; // 1~5점
+          const value = index + 1;
           const isSelected = selectedValue === value;
           return (
             <TouchableOpacity
@@ -104,37 +99,25 @@ export default function ChecklistCard({
                 styles.optionButton,
                 isSelected && {
                   borderColor: catStyle.color,
-                  backgroundColor: catStyle.color + "10",
+                  backgroundColor: catStyle.color + "08",
                 },
               ]}
               onPress={() => onSelect(value)}
               activeOpacity={0.7}
             >
               <View style={styles.optionRow}>
-                <View
-                  style={[
-                    styles.radioCircle,
-                    isSelected && { borderColor: catStyle.color },
-                  ]}
-                >
+                <View style={[
+                  styles.radioCircle,
+                  isSelected && { borderColor: catStyle.color },
+                ]}>
                   {isSelected && (
-                    <View
-                      style={[
-                        styles.radioInner,
-                        { backgroundColor: catStyle.color },
-                      ]}
-                    />
+                    <View style={[styles.radioInner, { backgroundColor: catStyle.color }]} />
                   )}
                 </View>
-                <Text
-                  style={[
-                    styles.optionText,
-                    isSelected && {
-                      fontWeight: "600",
-                      color: catStyle.color,
-                    },
-                  ]}
-                >
+                <Text style={[
+                  styles.optionText,
+                  isSelected && { fontWeight: "700", color: catStyle.color },
+                ]}>
                   {option}
                 </Text>
               </View>
@@ -163,11 +146,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     marginHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: COLORS.deepNavy, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12 },
+      android: { elevation: 5 },
+    }),
   },
   progressRow: {
     flexDirection: "row",
@@ -182,23 +166,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
-  categoryEmoji: {
-    fontSize: 14,
-    marginRight: 6,
-  },
+  categoryEmoji: { fontSize: 14, marginRight: 6 },
   categoryLabel: {
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "800",
     letterSpacing: 0.3,
   },
   counter: {
     fontSize: 13,
-    color: COLORS.textLight,
-    fontWeight: "500",
+    color: COLORS.textSecondary,
+    fontWeight: "600",
   },
   progressBarBg: {
     height: 4,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.border,
     borderRadius: 2,
     marginBottom: 24,
     overflow: "hidden",
@@ -209,17 +190,18 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontWeight: "800",
+    color: COLORS.deepNavy,
     lineHeight: 30,
     marginBottom: 24,
+    letterSpacing: -0.3,
   },
   optionsContainer: {
     gap: 10,
   },
   optionButton: {
     borderWidth: 1.5,
-    borderColor: "#E5E7EB",
+    borderColor: COLORS.border,
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -234,7 +216,7 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: "#D1D5DB",
+    borderColor: "#CBD5E1",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -252,8 +234,8 @@ const styles = StyleSheet.create({
   cheerText: {
     textAlign: "center",
     fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.accent,
+    fontWeight: "700",
+    color: COLORS.emerald,
     marginTop: 16,
   },
 });

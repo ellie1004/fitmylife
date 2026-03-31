@@ -1,8 +1,9 @@
 /**
- * YouTube 영상 재생 스크린
+ * YouTube 영상 재생 스크린 (Commercial UX)
  *
- * 선택한 영상을 앱 내 WebView로 임베드 재생합니다.
- * 영상 정보(제목, 채널, 조회수)와 다음 영상 미리보기를 제공합니다.
+ * CLAUDE_PRO_SPEC 기반:
+ * - Deep Navy / Electric Blue / Emerald 컬러 팔레트
+ * - 프리미엄 카드 + 강화된 그림자
  */
 
 import React from "react";
@@ -13,18 +14,22 @@ import {
   ScrollView,
   StyleSheet,
   Image,
+  Platform,
 } from "react-native";
 import YouTubePlayer from "../components/YouTubePlayer";
 import { useWorkoutStore } from "../stores/workoutStore";
 import type { VideoItem } from "../types";
 
 const COLORS = {
-  primary: "#2E75B6",
-  accent: "#4CAF50",
-  bg: "#F5F7FA",
+  deepNavy: "#0F172A",
+  electricBlue: "#3B82F6",
+  emerald: "#10B981",
+  bg: "#F8FAFC",
   card: "#FFFFFF",
-  text: "#1A1A2E",
-  textLight: "#6B7280",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  border: "#E2E8F0",
 };
 
 function formatDuration(seconds: number): string {
@@ -45,11 +50,7 @@ interface Props {
   onSelectVideo: (videoId: string) => void;
 }
 
-export default function VideoPlayerScreen({
-  videoId,
-  onBack,
-  onSelectVideo,
-}: Props) {
+export default function VideoPlayerScreen({ videoId, onBack, onSelectVideo }: Props) {
   const { workoutPlan } = useWorkoutStore();
   if (!workoutPlan) return null;
 
@@ -82,13 +83,9 @@ export default function VideoPlayerScreen({
             <View style={styles.metaRow}>
               <Text style={styles.channel}>{current.channel_title}</Text>
               <Text style={styles.dot}>·</Text>
-              <Text style={styles.meta}>
-                {formatViews(current.view_count)}
-              </Text>
+              <Text style={styles.meta}>{formatViews(current.view_count)}</Text>
               <Text style={styles.dot}>·</Text>
-              <Text style={styles.meta}>
-                {formatDuration(current.duration_seconds)}
-              </Text>
+              <Text style={styles.meta}>{formatDuration(current.duration_seconds)}</Text>
             </View>
             <View style={styles.scoreChip}>
               <Text style={styles.scoreChipText}>
@@ -140,40 +137,43 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 12,
     backgroundColor: COLORS.card,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   backBtn: { width: 50 },
   backText: {
     fontSize: 15,
-    color: COLORS.primary,
-    fontWeight: "600",
+    color: COLORS.electricBlue,
+    fontWeight: "700",
   },
   headerTitle: {
     fontSize: 15,
-    fontWeight: "600",
-    color: COLORS.textLight,
+    fontWeight: "700",
+    color: COLORS.textSecondary,
   },
   content: {
     paddingBottom: 40,
   },
-  // 영상 정보
   infoCard: {
     backgroundColor: COLORS.card,
     marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 16,
     padding: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: COLORS.deepNavy, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12 },
+      android: { elevation: 4 },
+    }),
   },
   videoTitle: {
     fontSize: 17,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontWeight: "800",
+    color: COLORS.deepNavy,
     lineHeight: 26,
     marginBottom: 8,
+    letterSpacing: -0.3,
   },
   metaRow: {
     flexDirection: "row",
@@ -182,40 +182,40 @@ const styles = StyleSheet.create({
   },
   channel: {
     fontSize: 13,
-    color: COLORS.primary,
-    fontWeight: "600",
+    color: COLORS.electricBlue,
+    fontWeight: "700",
   },
   dot: {
     fontSize: 13,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
     marginHorizontal: 5,
   },
   meta: {
     fontSize: 13,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
   },
   scoreChip: {
     alignSelf: "flex-start",
-    backgroundColor: "#ECFDF5",
+    backgroundColor: "rgba(16,185,129,0.1)",
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   scoreChipText: {
     fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.accent,
+    fontWeight: "700",
+    color: COLORS.emerald,
   },
-  // 다음 영상
   nextSection: {
     marginHorizontal: 16,
     marginTop: 24,
   },
   nextTitle: {
     fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontWeight: "800",
+    color: COLORS.deepNavy,
     marginBottom: 12,
+    letterSpacing: -0.3,
   },
   nextItem: {
     flexDirection: "row",
@@ -223,16 +223,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
     marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: COLORS.deepNavy, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 6 },
+      android: { elevation: 2 },
+    }),
   },
   nextThumb: {
     width: 120,
     height: 72,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.border,
   },
   nextInfo: {
     flex: 1,
@@ -241,13 +242,14 @@ const styles = StyleSheet.create({
   },
   nextVideoTitle: {
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
     color: COLORS.text,
     lineHeight: 18,
     marginBottom: 4,
   },
   nextChannel: {
     fontSize: 11,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
+    fontWeight: "500",
   },
 });

@@ -1,21 +1,24 @@
 /**
- * 운동 추천 카드 (YouTube 영상)
+ * 운동 추천 카드 (YouTube 영상) — Commercial UX
  *
- * 썸네일, 제목, 채널명, 영상 길이, 스코어를 보여주며
- * 탭하면 VideoPlayerScreen으로 이동합니다.
+ * CLAUDE_PRO_SPEC 기반:
+ * - Deep Navy / Electric Blue / Emerald 컬러 통일
+ * - 프리미엄 카드 그림자 + 세밀한 타이포그래피
  */
 
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import type { VideoItem } from "../types";
 
 const COLORS = {
-  primary: "#2E75B6",
-  accent: "#4CAF50",
+  deepNavy: "#0F172A",
+  electricBlue: "#3B82F6",
+  emerald: "#10B981",
   card: "#FFFFFF",
-  text: "#1A1A2E",
-  textLight: "#6B7280",
-  bg: "#F5F7FA",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  bg: "#F8FAFC",
+  border: "#E2E8F0",
 };
 
 interface Props {
@@ -24,14 +27,12 @@ interface Props {
   onPress: (videoId: string) => void;
 }
 
-/** 초를 "M:SS" 형식으로 변환 */
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** 조회수를 축약 표시 (예: 1.2만) */
 function formatViews(count: number): string {
   if (count >= 10000) return `${(count / 10000).toFixed(1)}만`;
   if (count >= 1000) return `${(count / 1000).toFixed(1)}천`;
@@ -96,11 +97,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 14,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: COLORS.deepNavy, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12 },
+      android: { elevation: 4 },
+    }),
   },
   thumbnailWrap: {
     position: "relative",
@@ -108,47 +110,52 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: "100%",
     height: 200,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.border,
   },
   durationBadge: {
     position: "absolute",
     bottom: 8,
     right: 8,
-    backgroundColor: "rgba(0,0,0,0.75)",
-    borderRadius: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    backgroundColor: "rgba(15,23,42,0.8)",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   durationText: {
     color: "#FFF",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   indexBadge: {
     position: "absolute",
     top: 8,
     left: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.electricBlue,
     borderRadius: 12,
-    width: 24,
-    height: 24,
+    width: 26,
+    height: 26,
     justifyContent: "center",
     alignItems: "center",
+    ...Platform.select({
+      ios: { shadowColor: COLORS.electricBlue, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 },
+      android: { elevation: 3 },
+    }),
   },
   indexText: {
     color: "#FFF",
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "800",
   },
   info: {
     padding: 14,
   },
   title: {
     fontSize: 15,
-    fontWeight: "600",
-    color: COLORS.text,
+    fontWeight: "700",
+    color: COLORS.deepNavy,
     lineHeight: 22,
     marginBottom: 6,
+    letterSpacing: -0.2,
   },
   meta: {
     flexDirection: "row",
@@ -157,17 +164,17 @@ const styles = StyleSheet.create({
   },
   channel: {
     fontSize: 12,
-    color: COLORS.textLight,
-    fontWeight: "500",
+    color: COLORS.textSecondary,
+    fontWeight: "600",
   },
   dot: {
     fontSize: 12,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
     marginHorizontal: 4,
   },
   views: {
     fontSize: 12,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
   },
   scoreRow: {
     flexDirection: "row",
@@ -175,26 +182,26 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     fontSize: 11,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
     marginRight: 8,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   scoreBarBg: {
     flex: 1,
     height: 6,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.border,
     borderRadius: 3,
     overflow: "hidden",
   },
   scoreBarFill: {
     height: "100%",
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.emerald,
     borderRadius: 3,
   },
   scoreValue: {
     fontSize: 12,
-    fontWeight: "700",
-    color: COLORS.accent,
+    fontWeight: "800",
+    color: COLORS.emerald,
     marginLeft: 8,
     minWidth: 24,
     textAlign: "right",

@@ -1,9 +1,10 @@
 /**
- * 온보딩 & 체크리스트 진단 스크린
+ * 온보딩 & 체크리스트 진단 스크린 (Commercial UX)
  *
- * 1) 사용자 기본 정보 입력 (닉네임, 나이, 성별)
- * 2) 18개 체크리스트 질문에 순차 응답 — 운동 동기부여 문구 포함
- * 3) 완료 시 운동처방 생성 → HomeScreen으로 이동
+ * CLAUDE_PRO_SPEC 기반:
+ * - Deep Navy / Electric Blue / Emerald 컬러 통일
+ * - 프리미엄 카드 디자인 + 부드러운 전환
+ * - Zero-Friction 온보딩 플로우
  */
 
 import React, { useState, useEffect } from "react";
@@ -27,13 +28,15 @@ import { useWorkoutStore } from "../stores/workoutStore";
 import type { ChecklistQuestion, ChecklistAnswer } from "../types";
 
 const COLORS = {
-  primary: "#2E75B6",
-  accent: "#4CAF50",
-  warning: "#FF9800",
-  bg: "#F5F7FA",
+  deepNavy: "#0F172A",
+  electricBlue: "#3B82F6",
+  emerald: "#10B981",
+  bg: "#F8FAFC",
   card: "#FFFFFF",
-  text: "#1A1A2E",
-  textLight: "#6B7280",
+  text: "#0F172A",
+  textSecondary: "#64748B",
+  textMuted: "#94A3B8",
+  border: "#E2E8F0",
 };
 
 // 체크리스트 진행 중 보여줄 동기부여 문구 (카테고리별)
@@ -64,7 +67,6 @@ const MOTIVATIONAL_QUOTES: Record<string, { emoji: string; text: string }[]> = {
   ],
 };
 
-// 로딩 화면 운동 이모지 애니메이션 시퀀스
 const LOADING_EMOJIS = ["🏋️", "🧘‍♀️", "🏃‍♂️", "🚴‍♀️", "🤸‍♀️", "🏊‍♀️"];
 
 interface Props {
@@ -75,37 +77,24 @@ type Step = "profile" | "checklist" | "loading";
 
 export default function OnboardingScreen({ onComplete }: Props) {
   const [step, setStep] = useState<Step>("profile");
-
-  // 프로필 입력
   const [nickname, setNickname] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<"male" | "female" | null>(null);
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-
-  // 체크리스트
   const [questions, setQuestions] = useState<ChecklistQuestion[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-
-  // 애니메이션
   const fadeAnim = useState(new Animated.Value(1))[0];
-  const loadingEmojiIndex = useState(new Animated.Value(0))[0];
   const [currentLoadingEmoji, setCurrentLoadingEmoji] = useState(0);
 
   const { setProfile } = useUserStore();
   const { setWorkoutPlan, setChecklistResult } = useWorkoutStore();
 
-  // 질문 목록 미리 로드
   useEffect(() => {
-    fetchQuestions()
-      .then(setQuestions)
-      .catch(() => {
-        // 오프라인 폴백: 빈 질문 → 기본 처방
-      });
+    fetchQuestions().then(setQuestions).catch(() => {});
   }, []);
 
-  // 로딩 이모지 순환
   useEffect(() => {
     if (step !== "loading") return;
     const interval = setInterval(() => {
@@ -114,23 +103,17 @@ export default function OnboardingScreen({ onComplete }: Props) {
     return () => clearInterval(interval);
   }, [step]);
 
-  // 카드 전환 애니메이션
   const animateTransition = (callback: () => void) => {
     Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
+      toValue: 0, duration: 150, useNativeDriver: true,
     }).start(() => {
       callback();
       Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
+        toValue: 1, duration: 200, useNativeDriver: true,
       }).start();
     });
   };
 
-  // 프로필 완료 → 체크리스트 시작
   const handleProfileDone = () => {
     if (!nickname.trim() || !age || !gender) return;
     setProfile({
@@ -143,38 +126,31 @@ export default function OnboardingScreen({ onComplete }: Props) {
     setStep("checklist");
   };
 
-  // 질문 답변 선택
   const handleSelect = (value: number) => {
     const q = questions[currentQ];
     const newAnswers = { ...answers, [q.id]: value };
     setAnswers(newAnswers);
-
-    // 0.4초 후 자동 다음 질문
     setTimeout(() => {
       if (currentQ < questions.length - 1) {
         animateTransition(() => setCurrentQ(currentQ + 1));
       } else {
-        // 마지막 질문 → 처방 생성
         handleSubmit(newAnswers);
       }
     }, 400);
   };
 
-  // 이전 질문
   const handleBack = () => {
     if (currentQ > 0) {
       animateTransition(() => setCurrentQ(currentQ - 1));
     }
   };
 
-  // 체크리스트 제출 & 운동처방 생성
   const handleSubmit = async (finalAnswers: Record<string, number>) => {
     setStep("loading");
     const userAge = parseInt(age);
     const answerList: ChecklistAnswer[] = Object.entries(finalAnswers).map(
       ([question_id, value]) => ({ question_id, value })
     );
-
     try {
       const plan = await generatePrescription({
         answers: answerList,
@@ -184,13 +160,11 @@ export default function OnboardingScreen({ onComplete }: Props) {
       setWorkoutPlan(plan);
       onComplete();
     } catch (err) {
-      // 네트워크 오류 시 기본 처방으로 폴백
       console.warn("처방 생성 실패:", err);
       setStep("checklist");
     }
   };
 
-  // 현재 질문의 동기부여 문구 가져오기
   const getMotivation = () => {
     if (!questions[currentQ]) return null;
     const cat = questions[currentQ].category;
@@ -209,7 +183,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
           contentContainerStyle={styles.profileContainer}
           keyboardShouldPersistTaps="handled"
         >
-          {/* 상단 운동 이모지 장식 */}
+          {/* 상단 브랜딩 */}
           <View style={styles.profileHeroEmojis}>
             <Text style={styles.heroEmojiText}>🏋️  🧘‍♀️  🏃‍♂️</Text>
           </View>
@@ -224,7 +198,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
             <TextInput
               style={styles.input}
               placeholder="예: 엘리"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={COLORS.textMuted}
               value={nickname}
               onChangeText={setNickname}
               maxLength={10}
@@ -234,7 +208,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
             <TextInput
               style={styles.input}
               placeholder="예: 28"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={COLORS.textMuted}
               keyboardType="number-pad"
               value={age}
               onChangeText={setAge}
@@ -247,7 +221,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
                 <TextInput
                   style={styles.input}
                   placeholder="예: 165"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={COLORS.textMuted}
                   keyboardType="number-pad"
                   value={height}
                   onChangeText={setHeight}
@@ -260,7 +234,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
                 <TextInput
                   style={styles.input}
                   placeholder="예: 60"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={COLORS.textMuted}
                   keyboardType="number-pad"
                   value={weight}
                   onChangeText={setWeight}
@@ -286,12 +260,10 @@ export default function OnboardingScreen({ onComplete }: Props) {
                   onPress={() => setGender(g.key)}
                 >
                   <Text style={styles.genderEmoji}>{g.emoji}</Text>
-                  <Text
-                    style={[
-                      styles.genderLabel,
-                      gender === g.key && styles.genderLabelSelected,
-                    ]}
-                  >
+                  <Text style={[
+                    styles.genderLabel,
+                    gender === g.key && styles.genderLabelSelected,
+                  ]}>
                     {g.label}
                   </Text>
                 </TouchableOpacity>
@@ -314,12 +286,9 @@ export default function OnboardingScreen({ onComplete }: Props) {
             본 앱은 의료적 진단이 아닌 건강 관리 목적으로 제공됩니다.
           </Text>
 
-          {/* 하단 크레딧 */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>Designed by </Text>
-            <TouchableOpacity
-              onPress={() => Linking.openURL("https://nugunaai.com/")}
-            >
+            <TouchableOpacity onPress={() => Linking.openURL("https://nugunaai.com/")}>
               <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
             </TouchableOpacity>
           </View>
@@ -345,7 +314,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
         </View>
         <ActivityIndicator
           size="small"
-          color={COLORS.accent}
+          color={COLORS.electricBlue}
           style={{ marginTop: 20 }}
         />
       </View>
@@ -357,7 +326,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
   if (!currentQuestion) {
     return (
       <View style={[styles.screen, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.electricBlue} />
         <Text style={styles.loadingText}>질문을 불러오는 중...</Text>
       </View>
     );
@@ -399,12 +368,9 @@ export default function OnboardingScreen({ onComplete }: Props) {
         </Animated.View>
       </View>
 
-      {/* 하단 크레딧 */}
       <View style={styles.footerChecklist}>
         <Text style={styles.footerText}>Designed by </Text>
-        <TouchableOpacity
-          onPress={() => Linking.openURL("https://nugunaai.com/")}
-        >
+        <TouchableOpacity onPress={() => Linking.openURL("https://nugunaai.com/")}>
           <Text style={styles.footerLink}>NuGuNaAi Ellie</Text>
         </TouchableOpacity>
       </View>
@@ -435,14 +401,14 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 36,
     fontWeight: "900",
-    color: COLORS.primary,
+    color: COLORS.deepNavy,
     textAlign: "center",
     marginBottom: 8,
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
     textAlign: "center",
     marginBottom: 36,
   },
@@ -450,24 +416,26 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: 20,
     padding: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...Platform.select({
+      ios: { shadowColor: COLORS.deepNavy, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12 },
+      android: { elevation: 5 },
+    }),
   },
   bodyRow: {
     flexDirection: "row",
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: COLORS.text,
     marginBottom: 8,
+    letterSpacing: -0.2,
   },
   input: {
     borderWidth: 1.5,
-    borderColor: "#E5E7EB",
+    borderColor: COLORS.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -482,15 +450,15 @@ const styles = StyleSheet.create({
   genderButton: {
     flex: 1,
     borderWidth: 1.5,
-    borderColor: "#E5E7EB",
+    borderColor: COLORS.border,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     backgroundColor: COLORS.bg,
   },
   genderSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: "#EBF3FB",
+    borderColor: COLORS.electricBlue,
+    backgroundColor: "rgba(59,130,246,0.06)",
   },
   genderEmoji: {
     fontSize: 28,
@@ -499,35 +467,36 @@ const styles = StyleSheet.create({
   genderLabel: {
     fontSize: 13,
     fontWeight: "600",
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
   },
   genderLabelSelected: {
-    color: COLORS.primary,
+    color: COLORS.electricBlue,
+    fontWeight: "700",
   },
   ctaButton: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.electricBlue,
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: 28,
     alignItems: "center",
-    shadowColor: COLORS.accent,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    ...Platform.select({
+      ios: { shadowColor: COLORS.electricBlue, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
+      android: { elevation: 5 },
+    }),
   },
   ctaDisabled: {
-    backgroundColor: "#B0C4DE",
+    backgroundColor: "#94A3B8",
     shadowOpacity: 0,
+    elevation: 0,
   },
   ctaText: {
     color: "#FFF",
     fontSize: 17,
-    fontWeight: "700",
+    fontWeight: "800",
   },
   disclaimer: {
     fontSize: 11,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
     textAlign: "center",
     marginTop: 16,
     lineHeight: 16,
@@ -541,41 +510,36 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 8,
   },
-  backButton: {
-    width: 60,
-  },
+  backButton: { width: 60 },
   backText: {
     fontSize: 15,
-    color: COLORS.primary,
-    fontWeight: "600",
+    color: COLORS.electricBlue,
+    fontWeight: "700",
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontWeight: "800",
+    color: COLORS.deepNavy,
+    letterSpacing: -0.3,
   },
-  // 동기부여 배너
   motivationBanner: {
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 16,
     marginTop: 4,
     marginBottom: 4,
-    backgroundColor: "#EBF3FB",
+    backgroundColor: "rgba(59,130,246,0.06)",
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
+    borderLeftColor: COLORS.electricBlue,
   },
-  motivationEmoji: {
-    fontSize: 18,
-    marginRight: 10,
-  },
+  motivationEmoji: { fontSize: 18, marginRight: 10 },
   motivationText: {
     fontSize: 13,
     fontWeight: "600",
-    color: COLORS.primary,
+    color: COLORS.electricBlue,
     flex: 1,
   },
   cardWrapper: {
@@ -588,14 +552,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 40,
   },
-  loadingEmoji: {
-    fontSize: 56,
-    marginBottom: 16,
-  },
+  loadingEmoji: { fontSize: 56, marginBottom: 16 },
   loadingText: {
     fontSize: 18,
     fontWeight: "700",
-    color: COLORS.text,
+    color: COLORS.deepNavy,
     textAlign: "center",
     marginTop: 8,
     lineHeight: 28,
@@ -606,17 +567,16 @@ const styles = StyleSheet.create({
   },
   loadingStep: {
     fontSize: 14,
-    color: COLORS.accent,
+    color: COLORS.emerald,
     fontWeight: "600",
     marginBottom: 8,
   },
   loadingStepPending: {
     fontSize: 14,
-    color: COLORS.textLight,
+    color: COLORS.textSecondary,
     fontWeight: "500",
     marginBottom: 8,
   },
-  // 하단 크레딧
   footer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -631,12 +591,12 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 11,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
   },
   footerLink: {
     fontSize: 11,
     fontWeight: "700",
-    color: COLORS.accent,
+    color: COLORS.emerald,
     textDecorationLine: "underline",
   },
 });
