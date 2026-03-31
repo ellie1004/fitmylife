@@ -14,13 +14,13 @@ let html = fs.readFileSync(indexPath, "utf-8");
 const ogTags = `
     <title>FitMyLife - AI 맞춤 운동처방</title>
     <meta name="description" content="AI가 분석하는 나만의 맞춤 운동 프로그램. 3분 체크리스트로 나의 운동 처방전 받기!" />
-    <meta name="theme-color" content="#0D0D0D" />
+    <meta name="theme-color" content="#0F172A" />
 
     <!-- Open Graph (카카오톡, 페이스북 등) -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="FitMyLife - AI 맞춤 운동처방" />
     <meta property="og:description" content="3분 체크리스트로 나만의 맞춤 운동 프로그램을 받아보세요! AI가 분석하고, YouTube 영상까지 큐레이션해드려요." />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="https://fitmylife.vercel.app/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="ko_KR" />
@@ -30,7 +30,7 @@ const ogTags = `
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="FitMyLife - AI 맞춤 운동처방" />
     <meta name="twitter:description" content="3분 체크리스트로 나만의 맞춤 운동 프로그램을 받아보세요!" />
-    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:image" content="https://fitmylife.vercel.app/og-image.png" />
 `;
 
 // 기존 <title> 태그 교체

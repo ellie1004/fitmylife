@@ -1,25 +1,106 @@
 <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0D0D0D"/>
-      <stop offset="100%" style="stop-color:#1a1a2e"/>
+      <stop offset="0%" style="stop-color:#0F172A"/>
+      <stop offset="100%" style="stop-color:#1E293B"/>
+    </linearGradient>
+    <linearGradient id="blueGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="greenGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:0"/>
     </linearGradient>
   </defs>
+
+  <!-- Background -->
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <!-- accent line -->
-  <rect x="80" y="180" width="50" height="4" rx="2" fill="#4CAF50"/>
-  <!-- tagline -->
-  <text x="80" y="160" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#4CAF50" letter-spacing="4">YOUR FITNESS JOURNEY</text>
-  <!-- logo -->
-  <text x="80" y="270" font-family="Arial,sans-serif" font-size="72" font-weight="900" fill="#FFFFFF">FitMyLife</text>
-  <!-- subtitle -->
-  <text x="80" y="330" font-family="Arial,sans-serif" font-size="28" font-weight="600" fill="rgba(255,255,255,0.8)">AI가 분석하는 나만의 맞춤 운동 프로그램</text>
-  <!-- description -->
-  <text x="80" y="380" font-family="Arial,sans-serif" font-size="20" fill="rgba(255,255,255,0.5)">3분 체크리스트로 나의 운동 처방전 받기</text>
-  <!-- fitness emojis -->
-  <text x="80" y="480" font-family="Arial,sans-serif" font-size="48">🏋️ 🧘‍♀️ 🏃‍♂️ 💪 🔥</text>
-  <!-- credit -->
-  <text x="80" y="570" font-family="Arial,sans-serif" font-size="16" fill="rgba(255,255,255,0.3)">Designed by NuGuNaAi Ellie</text>
-  <!-- green accent bar bottom -->
-  <rect x="0" y="620" width="1200" height="10" fill="#4CAF50"/>
+
+  <!-- Decorative glow circles -->
+  <circle cx="950" cy="120" r="200" fill="url(#blueGlow)"/>
+  <circle cx="1050" cy="450" r="180" fill="url(#greenGlow)"/>
+
+  <!-- Grid pattern (subtle) -->
+  <g opacity="0.03" stroke="#FFFFFF" stroke-width="1">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="500" x2="1200" y2="500"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Floating fitness icons (decorative) -->
+  <g opacity="0.08">
+    <text x="820" y="100" font-size="64">🏋️</text>
+    <text x="1000" y="200" font-size="52">🧘‍♀️</text>
+    <text x="900" y="350" font-size="58">💪</text>
+    <text x="1050" y="480" font-size="48">🏃‍♂️</text>
+    <text x="780" y="500" font-size="44">🔥</text>
+  </g>
+
+  <!-- Electric Blue accent line -->
+  <rect x="80" y="175" width="60" height="4" rx="2" fill="#3B82F6"/>
+
+  <!-- Tagline -->
+  <text x="80" y="160" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="16" font-weight="700" fill="#3B82F6" letter-spacing="5">YOUR FITNESS JOURNEY</text>
+
+  <!-- Logo -->
+  <text x="80" y="270" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="80" font-weight="900" fill="#FFFFFF" letter-spacing="-2">FitMyLife</text>
+
+  <!-- Subtitle -->
+  <text x="80" y="330" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="26" font-weight="600" fill="rgba(255,255,255,0.85)">AI-Powered Personalized Fitness Program</text>
+
+  <!-- Description line 1 -->
+  <text x="80" y="385" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="20" fill="rgba(255,255,255,0.5)">Smart Checklist  ·  FITT-VP Algorithm  ·  YouTube Curation</text>
+
+  <!-- Feature badges -->
+  <g>
+    <!-- Badge 1 -->
+    <rect x="80" y="430" width="160" height="44" rx="22" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+    <text x="115" y="458" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="15" font-weight="700" fill="#3B82F6">📋  AI Diagnosis</text>
+
+    <!-- Badge 2 -->
+    <rect x="260" y="430" width="180" height="44" rx="22" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+    <text x="295" y="458" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="15" font-weight="700" fill="#10B981">💪  FITT Rx Engine</text>
+
+    <!-- Badge 3 -->
+    <rect x="460" y="430" width="200" height="44" rx="22" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+    <text x="495" y="458" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="15" font-weight="700" fill="#F59E0B">🎬  Video Curation</text>
+  </g>
+
+  <!-- Bottom bar with Electric Blue -->
+  <rect x="0" y="618" width="1200" height="12" fill="#3B82F6"/>
+
+  <!-- Credit -->
+  <text x="80" y="580" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="14" fill="rgba(255,255,255,0.25)">Designed by NuGuNaAi Ellie  ·  fitmylife.vercel.app</text>
+
+  <!-- Right side: Abstract fitness visualization -->
+  <g transform="translate(850, 180)">
+    <!-- Pulse ring -->
+    <circle cx="120" cy="120" r="100" fill="none" stroke="rgba(59,130,246,0.15)" stroke-width="2"/>
+    <circle cx="120" cy="120" r="70" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="2"/>
+    <circle cx="120" cy="120" r="40" fill="none" stroke="rgba(245,158,11,0.15)" stroke-width="2"/>
+    <!-- Center dot -->
+    <circle cx="120" cy="120" r="8" fill="#3B82F6"/>
+    <!-- Data points -->
+    <circle cx="120" cy="20" r="5" fill="#3B82F6" opacity="0.6"/>
+    <circle cx="207" cy="70" r="5" fill="#10B981" opacity="0.6"/>
+    <circle cx="207" cy="170" r="5" fill="#F59E0B" opacity="0.6"/>
+    <circle cx="120" cy="220" r="5" fill="#EF4444" opacity="0.6"/>
+    <circle cx="33" cy="170" r="5" fill="#7C3AED" opacity="0.6"/>
+    <circle cx="33" cy="70" r="5" fill="#3B82F6" opacity="0.6"/>
+    <!-- Connecting lines -->
+    <line x1="120" y1="20" x2="207" y2="70" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+    <line x1="207" y1="70" x2="207" y2="170" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+    <line x1="207" y1="170" x2="120" y2="220" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <line x1="120" y1="220" x2="33" y2="170" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+    <line x1="33" y1="170" x2="33" y2="70" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
+    <line x1="33" y1="70" x2="120" y2="20" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+  </g>
 </svg>
