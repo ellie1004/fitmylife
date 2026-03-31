@@ -1,0 +1,160 @@
+# FitMyLife - AI 맞춤 운동처방 앱
+
+> 라이프스타일 체크리스트 진단 → FITT-VP 알고리즘 운동 처방 → YouTube 영상 AI 큐레이션 모바일 앱
+
+## 프로젝트 개요
+
+FitMyLife는 사용자의 라이프스타일을 체크리스트로 진단하고, FITT-VP(빈도·강도·시간·유형·운동량·점진성) 알고리즘으로 맞춤 운동 프로그램을 산출한 뒤, YouTube Data API v3로 검증된 운동 영상을 자동 매칭하여 제공하는 모바일 앱입니다.
+
+자체 영상 제작 없이 YouTube 큐레이션 방식으로 운영되며, 의료적 진단이 아닌 건강 관리 목적의 서비스입니다.
+
+## 기술 스택
+
+- **프론트엔드**: React Native (Expo SDK 52) + TypeScript
+- **상태관리**: Zustand (localStorage 영속화)
+- **백엔드**: FastAPI (Python 3.11+) — 오프라인 폴백 내장
+- **AI 엔진**: Claude API (Anthropic) — 운동처방 추론 + 쿼리 생성
+- **영상 소스**: YouTube Data API v3
+- **인증**: Firebase Auth
+- **캐싱**: Redis (YouTube API 응답 캐싱)
+- **DB**: SQLite (MVP) → PostgreSQL (스케일업)
+
+## 디자인 시스템
+
+CLAUDE_PRO_SPEC.md 기반 상업용 디자인:
+
+- **Primary**: Deep Navy (#0F172A) — 전문성·신뢰감
+- **Accent**: Electric Blue (#3B82F6) — CTA·인터랙션
+- **Success**: Emerald (#10B981) — 건강·성취감
+- **Warning**: Amber (#F59E0B)
+- **Background**: #F8FAFC
+- **타이포그래피**: Pretendard (한글) / Inter (영문), fontWeight 800, letterSpacing -0.3
+
+## 핵심 아키텍처
+
+```
+[사용자] → [체크리스트 18문항] → [FITT-VP 엔진] → [쿼리 빌더] → [YouTube API] → [필터·스코어링] → [영상 추천]
+```
+
+### 체크리스트 (6개 영역 × 3문항 = 18문항)
+- 신체활동, 식습관, 수면, 스트레스, 건강상태, 운동경험
+- 5점 리커트 척도 → 가중 평균 점수 산출
+
+### FITT-VP 처방 로직
+- 점수 < 35: 저강도 (3회/주, 15분, 유연성)
+- 점수 35-65: 중강도 (4회/주, 25분, 유산소)
+- 점수 > 65: 고강도 (5회/주, 35분, 근력)
+- 60세 이상: 항상 저강도 오버라이드
+
+### YouTube 스코어링
+- 조회수 가중치 30% + 좋아요 비율 20% + 채널 신뢰도 30% + 영상 길이 매칭도 20%
+
+## 앱 화면 구조
+
+```
+WelcomeScreen → OnboardingScreen → HomeScreen → WorkoutScreen → VideoPlayerScreen
+```
+
+| 화면 | 역할 |
+|---|---|
+| WelcomeScreen | 브랜딩 랜딩 (Deep Navy 배경, 애니메이션 CTA) |
+| OnboardingScreen | 프로필 입력 + 18문항 체크리스트 진단 |
+| HomeScreen | 메인 대시보드 (목표 트래커, FITT 처방, 식단 가이드, 고민 부위 선택) |
+| WorkoutScreen | 큐레이션된 YouTube 영상 리스트 |
+| VideoPlayerScreen | YouTube 임베드 재생 + 다음 영상 캐러셀 |
+
+## 주요 컴포넌트
+
+| 컴포넌트 | 역할 |
+|---|---|
+| ChecklistCard | 체크리스트 질문 카드 (카테고리별 컬러, 리커트 척도) |
+| WorkoutCard | YouTube 영상 카드 (썸네일, 매칭도 스코어 바) |
+| YouTubePlayer | YouTube 임베드 (Web: iframe / Native: WebView) |
+| ProgressBar | 원형 진행률 게이지 |
+
+## Zustand 스토어
+
+| 스토어 | 영속화 키 | 데이터 |
+|---|---|---|
+| userStore | fitmylife_profile | 나이, 성별, 닉네임, 키, 몸무게, 고민 부위 |
+| workoutStore | fitmylife_plan, fitmylife_checklist_result | FITT 처방, 영상 리스트, 체크리스트 결과 |
+| goalStore | fitmylife_goal | 목표(3/7/21/100일), 완료일, 연속일수, 시청 영상 |
+
+## API 엔드포인트
+
+| Method | Path | 설명 |
+|---|---|---|
+| GET | /api/v1/checklist/questions | 체크리스트 질문 목록 |
+| POST | /api/v1/checklist/submit | 체크리스트 제출 → 분석 결과 |
+| POST | /api/v1/prescription/generate | FITT-VP 처방 + 영상 큐레이션 |
+| GET | /api/v1/youtube/search | YouTube 영상 검색 |
+
+모든 API 응답 형식: `{ "success": bool, "data": any, "message": str }`
+
+## 오프라인 폴백
+
+API 연결 불가 시 클라이언트 내장 데이터로 완전 작동:
+- 18개 체크리스트 질문 내장
+- 로컬 스코어링 알고리즘
+- 강도별·부위별 사전 큐레이션 영상 풀 (약 40개)
+- 시청 이력 기반 영상 로테이션 (중복 방지)
+
+## 고민 부위 운동
+
+8개 부위 지원: 턱선, 팔뚝, 복부, 등, 어깨, 허벅지, 엉덩이, 종아리
+- 부위별 사전 검증된 YouTube 영상 3~5개
+- 복수 부위 동시 선택 가능
+
+## UX 특징
+
+- **Sticky CTA**: 운동 시작 버튼 화면 하단 고정
+- **Progressive Disclosure**: 운동 가이드·식단 가이드 아코디언 접이식
+- **목표 게이미피케이션**: 3일 → 7일 → 21일 → 100일 단계별 도전
+- **시니어 전용**: 60세 이상 자동 감지, 전용 영상·사이트 안내
+- **개인화 식단**: 나이·성별 기반 일일 칼로리·영양 가이드
+
+## 코딩 컨벤션
+
+- 한국어 주석, 영문 코드
+- 커밋 메시지: 한국어 (`feat:`, `fix:` 접두사)
+- 컴포넌트: PascalCase / 파일: kebab-case (프론트) · snake_case (백엔드)
+- YouTube API 키는 백엔드(.env)에서만 관리, 프론트 노출 금지
+
+## 파일 구조
+
+```
+fitmylife/
+├── mobile/
+│   ├── App.tsx                          # 앱 엔트리 + 네비게이션
+│   ├── src/
+│   │   ├── screens/
+│   │   │   ├── WelcomeScreen.tsx        # 브랜딩 랜딩
+│   │   │   ├── OnboardingScreen.tsx     # 프로필 + 체크리스트
+│   │   │   ├── HomeScreen.tsx           # 메인 대시보드
+│   │   │   ├── WorkoutScreen.tsx        # 영상 리스트
+│   │   │   └── VideoPlayerScreen.tsx    # YouTube 재생
+│   │   ├── components/
+│   │   │   ├── ChecklistCard.tsx        # 진단 카드
+│   │   │   ├── WorkoutCard.tsx          # 영상 카드
+│   │   │   ├── YouTubePlayer.tsx        # YouTube 임베드
+│   │   │   └── ProgressBar.tsx          # 원형 게이지
+│   │   ├── stores/
+│   │   │   ├── userStore.ts             # 사용자 프로필
+│   │   │   ├── workoutStore.ts          # 운동 처방·영상
+│   │   │   └── goalStore.ts             # 목표 트래커
+│   │   ├── services/
+│   │   │   └── api.ts                   # API + 오프라인 폴백
+│   │   └── types/
+│   │       └── index.ts                 # TypeScript 타입
+│   ├── app.json
+│   └── package.json
+├── backend/                             # FastAPI 서버
+├── CLAUDE.md                            # AI 개발 가이드
+├── CLAUDE_PRO_SPEC.md                   # 상업적 디자인 스펙
+└── llms.txt                             # 이 파일
+```
+
+## 연락처
+
+- 디자인: NuGuNaAi Ellie (https://nugunaai.com/)
+- 저장소: https://github.com/ellie1004/fitmylife
